@@ -3,12 +3,12 @@
 	{
 		"description": "nDisplay configuration",
 		"version": "5.00",
-		"assetPath": "/Game/Switchboard/nDisplay_Desktop.nDisplay_Desktop",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Desktop.nDisplay_Desktop",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,
 			"bExitOnEsc": true,
-			"bOverrideViewportsFromExternalConfig": false
+			"bOverrideViewportsFromExternalConfig": true
 		},
 		"scene":
 		{

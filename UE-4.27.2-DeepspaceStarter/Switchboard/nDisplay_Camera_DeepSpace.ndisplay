@@ -3,7 +3,7 @@
 	{
 		"description": "",
 		"version": "4.27",
-		"assetPath": "/Game/Switchboard/nDisplay_Camera_DeepSpace.nDisplay_Camera_DeepSpace",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Camera_DeepSpace.nDisplay_Camera_DeepSpace",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,

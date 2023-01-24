@@ -3,7 +3,7 @@
 	{
 		"description": "nDisplay configuration",
 		"version": "4.27",
-		"assetPath": "/Game/Switchboard/nDisplay_Camera_Desktop.nDisplay_Camera_Desktop",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Camera_Desktop.nDisplay_Camera_Desktop",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,

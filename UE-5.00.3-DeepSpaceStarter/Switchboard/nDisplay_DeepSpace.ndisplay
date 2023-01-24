@@ -3,12 +3,12 @@
 	{
 		"description": "",
 		"version": "5.00",
-		"assetPath": "/Game/Switchboard/nDisplay_DeepSpace.nDisplay_DeepSpace",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_DeepSpace.nDisplay_DeepSpace",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,
 			"bExitOnEsc": true,
-			"bOverrideViewportsFromExternalConfig": false
+			"bOverrideViewportsFromExternalConfig": true
 		},
 		"scene":
 		{
