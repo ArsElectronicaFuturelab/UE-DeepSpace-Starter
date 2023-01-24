@@ -1,0 +1,367 @@
+{
+	"nDisplay":
+	{
+		"description": "nDisplay configuration",
+		"version": "5.00",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Remote_Desktop.nDisplay_Remote_Desktop",
+		"misc":
+		{
+			"bFollowLocalPlayerCamera": false,
+			"bExitOnEsc": true,
+			"bOverrideViewportsFromExternalConfig": true
+		},
+		"scene":
+		{
+			"xforms":
+			{
+				"desktop_origin":
+				{
+					"parentId": "",
+					"location":
+					{
+						"x": 0,
+						"y": 0,
+						"z": 0
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				},
+				"trans_wall":
+				{
+					"parentId": "desktop_origin",
+					"location":
+					{
+						"x": 400,
+						"y": 0,
+						"z": 400
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				},
+				"m_wall":
+				{
+					"parentId": "trans_wall",
+					"location":
+					{
+						"x": 350,
+						"y": -2.7462319849291816e-06,
+						"z": 22.518524169921875
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 90,
+						"roll": 90
+					}
+				},
+				"trans_floor":
+				{
+					"parentId": "desktop_origin",
+					"location":
+					{
+						"x": 400,
+						"y": 0,
+						"z": 400
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				},
+				"m_floor":
+				{
+					"parentId": "trans_floor",
+					"location":
+					{
+						"x": -70,
+						"y": 0,
+						"z": -399
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 90,
+						"roll": 0
+					}
+				}
+			},
+			"cameras":
+			{
+				"DefaultViewPoint":
+				{
+					"interpupillaryDistance": 6.4000000953674316,
+					"swapEyes": false,
+					"stereoOffset": "none",
+					"parentId": "",
+					"location":
+					{
+						"x": 0,
+						"y": 0,
+						"z": 180
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				}
+			},
+			"screens":
+			{
+			}
+		},
+		"cluster":
+		{
+			"primaryNode":
+			{
+				"id": "node_laptop",
+				"ports":
+				{
+					"ClusterSync": 41001,
+					"ClusterEventsJson": 41003,
+					"ClusterEventsBinary": 41004
+				}
+			},
+			"sync":
+			{
+				"renderSyncPolicy":
+				{
+					"type": "ethernet",
+					"parameters":
+					{
+					}
+				},
+				"inputSyncPolicy":
+				{
+					"type": "ReplicatePrimary",
+					"parameters":
+					{
+					}
+				}
+			},
+			"network":
+			{
+				"ConnectRetriesAmount": "10",
+				"ConnectRetryDelay": "1000",
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"failover":
+			{
+				"failoverPolicy": "Disabled"
+			},
+			"nodes":
+			{
+				"node_laptop":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 960,
+						"h": 540
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_laptop":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": 1,
+							"allowCrossGPUTransfer": false,
+							"isShared": false,
+							"overscan":
+							{
+								"bEnabled": false,
+								"mode": "percent",
+								"left": 0,
+								"right": 0,
+								"top": 0,
+								"bottom": 0,
+								"oversize": true
+							},
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 960,
+								"h": 540
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "m_wall",
+									"section_index": "0.0",
+									"base_uv_index": "-1.0",
+									"chromakey_uv_index": "-1.0"
+								}
+							}
+						}
+					},
+					"outputRemap":
+					{
+						"bEnable": false,
+						"dataSource": "mesh",
+						"staticMeshAsset": "",
+						"externalFile": ""
+					}
+				},
+				"node_floor":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 960,
+						"y": 540,
+						"w": 960,
+						"h": 540
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_floor":
+						{
+							"camera": "",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": false,
+							"isShared": false,
+							"overscan":
+							{
+								"bEnabled": false,
+								"mode": "percent",
+								"left": 0,
+								"right": 0,
+								"top": 0,
+								"bottom": 0,
+								"oversize": true
+							},
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 960,
+								"h": 540
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "m_floor",
+									"section_index": "0.0",
+									"base_uv_index": "-1.0",
+									"chromakey_uv_index": "-1.0"
+								}
+							}
+						}
+					},
+					"outputRemap":
+					{
+						"bEnable": false,
+						"dataSource": "mesh",
+						"staticMeshAsset": "",
+						"externalFile": ""
+					}
+				},
+				"node_wall":
+				{
+					"host": "127.0.0.1",
+					"sound": true,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 960,
+						"y": 0,
+						"w": 960,
+						"h": 540
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_wall":
+						{
+							"camera": "",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": false,
+							"isShared": false,
+							"overscan":
+							{
+								"bEnabled": false,
+								"mode": "percent",
+								"left": 0,
+								"right": 0,
+								"top": 0,
+								"bottom": 0,
+								"oversize": true
+							},
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 960,
+								"h": 540
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"section_index": "0.0",
+									"base_uv_index": "-1.0",
+									"chromakey_uv_index": "-1.0",
+									"mesh_component": "m_wall"
+								}
+							}
+						}
+					},
+					"outputRemap":
+					{
+						"bEnable": false,
+						"dataSource": "mesh",
+						"staticMeshAsset": "",
+						"externalFile": ""
+					}
+				}
+			}
+		},
+		"customParameters":
+		{
+			"SampleArg1": "SampleVal1"
+		},
+		"diagnostics":
+		{
+			"simulateLag": false,
+			"minLagTime": 0.0099999997764825821,
+			"maxLagTime": 0.5
+		}
+	}
+}

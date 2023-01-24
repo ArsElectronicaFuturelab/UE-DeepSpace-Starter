@@ -1,0 +1,12 @@
+{
+    "startMap": "CameraMap",
+    "version": "UE5.01",
+    "wall": {
+        "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
+        "nDisplay": "\\Switchboard\\nDisplay_Desktop.ndisplay"
+    },
+    "floor": {
+        "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
+        "nDisplay": "\\Switchboard\\nDisplay_Desktop.ndisplay"
+    }
+}
