@@ -2,6 +2,6 @@
     "pharusTrackerBindNIC": "127.0.0.1",
     "pharusPort": 44345,
     "inDeepSpace": false,
-    "xSize": 80.5,
+    "xSize": 80,
     "ySize": 100.0
 }
