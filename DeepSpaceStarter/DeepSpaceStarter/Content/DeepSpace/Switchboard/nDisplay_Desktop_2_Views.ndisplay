@@ -1,19 +1,20 @@
 {
 	"nDisplay":
 	{
-		"description": "",
-		"version": "4.27",
-		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Camera_DeepSpace.nDisplay_Camera_DeepSpace",
+		"description": "nDisplay configuration",
+		"version": "5.00",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Desktop_2_Views.nDisplay_Desktop_2_Views",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,
-			"bExitOnEsc": true
+			"bExitOnEsc": true,
+			"bOverrideViewportsFromExternalConfig": true
 		},
 		"scene":
 		{
 			"xforms":
 			{
-				"ds_origin":
+				"desktop_origin":
 				{
 					"parentId": "",
 					"location":
@@ -29,9 +30,41 @@
 						"roll": 0
 					}
 				},
+				"trans_wall":
+				{
+					"parentId": "desktop_origin",
+					"location":
+					{
+						"x": 400,
+						"y": 0,
+						"z": 400
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				},
+				"m_wall":
+				{
+					"parentId": "trans_wall",
+					"location":
+					{
+						"x": 350,
+						"y": -2.7462319849291816e-06,
+						"z": 22.518524169921875
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 90,
+						"roll": 90
+					}
+				},
 				"trans_floor":
 				{
-					"parentId": "ds_origin",
+					"parentId": "desktop_origin",
 					"location":
 					{
 						"x": 400,
@@ -60,67 +93,19 @@
 						"yaw": 90,
 						"roll": 0
 					}
-				},
-				"trans_wall":
-				{
-					"parentId": "ds_origin",
-					"location":
-					{
-						"x": 400,
-						"y": 0,
-						"z": 400
-					},
-					"rotation":
-					{
-						"pitch": 0,
-						"yaw": 0,
-						"roll": 0
-					}
-				},
-				"m_wall":
-				{
-					"parentId": "trans_wall",
-					"location":
-					{
-						"x": 350,
-						"y": -2.5827166609815322e-06,
-						"z": 20.768310546875
-					},
-					"rotation":
-					{
-						"pitch": 0,
-						"yaw": 90,
-						"roll": 90
-					}
-				},
-				"ICVFXCamera":
-				{
-					"parentId": "",
-					"location":
-					{
-						"x": -600,
-						"y": 0,
-						"z": 180
-					},
-					"rotation":
-					{
-						"pitch": 0,
-						"yaw": 0,
-						"roll": 0
-					}
 				}
 			},
 			"cameras":
 			{
 				"DefaultViewPoint":
 				{
-					"interpupillaryDistance": 35,
+					"interpupillaryDistance": 6.4000000953674316,
 					"swapEyes": false,
 					"stereoOffset": "none",
 					"parentId": "",
 					"location":
 					{
-						"x": 10,
+						"x": 0,
 						"y": 0,
 						"z": 180
 					},
@@ -129,6 +114,25 @@
 						"pitch": 0,
 						"yaw": 0,
 						"roll": 0
+					}
+				},
+				"Floor View Point":
+				{
+					"interpupillaryDistance": 6.4000000953674316,
+					"swapEyes": false,
+					"stereoOffset": "none",
+					"parentId": "",
+					"location":
+					{
+						"x": 350,
+						"y": -0,
+						"z": 600
+					},
+					"rotation":
+					{
+						"pitch": -90,
+						"yaw": 180,
+						"roll": 180
 					}
 				}
 			},
@@ -138,13 +142,12 @@
 		},
 		"cluster":
 		{
-			"masterNode":
+			"primaryNode":
 			{
 				"id": "node_wall",
 				"ports":
 				{
 					"ClusterSync": 41001,
-					"RenderSync": 41002,
 					"ClusterEventsJson": 41003,
 					"ClusterEventsBinary": 41004
 				}
@@ -160,7 +163,7 @@
 				},
 				"inputSyncPolicy":
 				{
-					"type": "ReplicateMaster",
+					"type": "ReplicatePrimary",
 					"parameters":
 					{
 					}
@@ -168,26 +171,31 @@
 			},
 			"network":
 			{
-				"ConnectRetriesAmount": "300",
+				"ConnectRetriesAmount": "10",
 				"ConnectRetryDelay": "1000",
-				"GameStartBarrierTimeout": "18000000",
-				"FrameStartBarrierTimeout": "1800000",
-				"FrameEndBarrierTimeout": "1800000",
-				"RenderSyncBarrierTimeout": "1800000"
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"failover":
+			{
+				"failoverPolicy": "Disabled"
 			},
 			"nodes":
 			{
 				"node_wall":
 				{
-					"host": "192.168.19.114",
+					"host": "127.0.0.1",
 					"sound": true,
-					"fullScreen": true,
+					"fullScreen": false,
+					"textureShare": false,
 					"window":
 					{
 						"x": 0,
 						"y": 0,
-						"w": 6467,
-						"h": 3830
+						"w": 960,
+						"h": 540
 					},
 					"postprocess":
 					{
@@ -198,17 +206,13 @@
 						{
 							"camera": "DefaultViewPoint",
 							"bufferRatio": 1,
-							"gPUIndex": -1,
-							"textureShare":
-							{
-								"bIsEnabled": false,
-								"syncPolicy_Connection": 0,
-								"syncPolicy_Frame": 0,
-								"syncPolicy_Texture": 0
-							},
+							"gPUIndex": 1,
+							"allowCrossGPUTransfer": false,
+							"isShared": false,
 							"overscan":
 							{
-								"mode": "none",
+								"bEnabled": false,
+								"mode": "percent",
 								"left": 0,
 								"right": 0,
 								"top": 0,
@@ -219,15 +223,18 @@
 							{
 								"x": 0,
 								"y": 0,
-								"w": 6467,
-								"h": 3830
+								"w": 960,
+								"h": 540
 							},
 							"projectionPolicy":
 							{
 								"type": "Mesh",
 								"parameters":
 								{
-									"mesh_component": "m_wall"
+									"mesh_component": "m_wall",
+									"section_index": "0.0",
+									"base_uv_index": "-1.0",
+									"chromakey_uv_index": "-1.0"
 								}
 							}
 						}
@@ -242,15 +249,16 @@
 				},
 				"node_floor":
 				{
-					"host": "192.168.19.115",
+					"host": "127.0.0.1",
 					"sound": false,
-					"fullScreen": true,
+					"fullScreen": false,
+					"textureShare": false,
 					"window":
 					{
 						"x": 0,
-						"y": 0,
-						"w": 6467,
-						"h": 3595
+						"y": 540,
+						"w": 960,
+						"h": 540
 					},
 					"postprocess":
 					{
@@ -259,19 +267,15 @@
 					{
 						"vp_floor":
 						{
-							"camera": "",
+							"camera": "Floor View Point",
 							"bufferRatio": 1,
 							"gPUIndex": -1,
-							"textureShare":
-							{
-								"bIsEnabled": false,
-								"syncPolicy_Connection": 0,
-								"syncPolicy_Frame": 0,
-								"syncPolicy_Texture": 0
-							},
+							"allowCrossGPUTransfer": false,
+							"isShared": false,
 							"overscan":
 							{
-								"mode": "none",
+								"bEnabled": false,
+								"mode": "percent",
 								"left": 0,
 								"right": 0,
 								"top": 0,
@@ -282,15 +286,18 @@
 							{
 								"x": 0,
 								"y": 0,
-								"w": 6467,
-								"h": 3595
+								"w": 960,
+								"h": 540
 							},
 							"projectionPolicy":
 							{
 								"type": "Mesh",
 								"parameters":
 								{
-									"mesh_component": "m_floor"
+									"mesh_component": "m_floor",
+									"section_index": "0.0",
+									"base_uv_index": "-1.0",
+									"chromakey_uv_index": "-1.0"
 								}
 							}
 						}
@@ -307,12 +314,13 @@
 		},
 		"customParameters":
 		{
+			"SampleArg1": "SampleVal1"
 		},
 		"diagnostics":
 		{
 			"simulateLag": false,
-			"minLagTime": 0,
-			"maxLagTime": 0
+			"minLagTime": 0.0099999997764825821,
+			"maxLagTime": 0.5
 		}
 	}
 }
