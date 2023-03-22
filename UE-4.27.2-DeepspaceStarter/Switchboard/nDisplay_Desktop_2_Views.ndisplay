@@ -3,7 +3,7 @@
 	{
 		"description": "nDisplay configuration",
 		"version": "4.27",
-		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Desktop.nDisplay_Desktop",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Desktop_2_Views.nDisplay_Desktop_2_Views",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,
@@ -51,7 +51,7 @@
 					"location":
 					{
 						"x": 350,
-						"y": -2.7462319849291816e-06,
+						"y": -3.0000001061125658e-06,
 						"z": 22.518524169921875
 					},
 					"rotation":
@@ -113,6 +113,25 @@
 						"pitch": 0,
 						"yaw": 0,
 						"roll": 0
+					}
+				},
+				"Floor View Point":
+				{
+					"interpupillaryDistance": 6.4000000953674316,
+					"swapEyes": false,
+					"stereoOffset": "none",
+					"parentId": "",
+					"location":
+					{
+						"x": 350,
+						"y": -3.0553350648110378e-12,
+						"z": 600
+					},
+					"rotation":
+					{
+						"pitch": -90,
+						"yaw": 180,
+						"roll": 180
 					}
 				}
 			},
@@ -243,7 +262,7 @@
 					{
 						"vp_floor":
 						{
-							"camera": "",
+							"camera": "Floor View Point",
 							"bufferRatio": 1,
 							"gPUIndex": -1,
 							"textureShare":

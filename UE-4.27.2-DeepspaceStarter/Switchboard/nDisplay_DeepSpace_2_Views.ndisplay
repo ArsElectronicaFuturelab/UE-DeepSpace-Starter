@@ -1,9 +1,9 @@
 {
 	"nDisplay":
 	{
-		"description": "nDisplay configuration",
+		"description": "",
 		"version": "4.27",
-		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_Desktop.nDisplay_Desktop",
+		"assetPath": "/Game/DeepSpace/Switchboard/nDisplay_DeepSpace_2_Views.nDisplay_DeepSpace_2_Views",
 		"misc":
 		{
 			"bFollowLocalPlayerCamera": false,
@@ -13,7 +13,7 @@
 		{
 			"xforms":
 			{
-				"desktop_origin":
+				"ds_origin":
 				{
 					"parentId": "",
 					"location":
@@ -29,41 +29,9 @@
 						"roll": 0
 					}
 				},
-				"trans_wall":
-				{
-					"parentId": "desktop_origin",
-					"location":
-					{
-						"x": 400,
-						"y": 0,
-						"z": 400
-					},
-					"rotation":
-					{
-						"pitch": 0,
-						"yaw": 0,
-						"roll": 0
-					}
-				},
-				"m_wall":
-				{
-					"parentId": "trans_wall",
-					"location":
-					{
-						"x": 350,
-						"y": -2.7462319849291816e-06,
-						"z": 22.518524169921875
-					},
-					"rotation":
-					{
-						"pitch": 0,
-						"yaw": 90,
-						"roll": 90
-					}
-				},
 				"trans_floor":
 				{
-					"parentId": "desktop_origin",
+					"parentId": "ds_origin",
 					"location":
 					{
 						"x": 400,
@@ -92,19 +60,51 @@
 						"yaw": 90,
 						"roll": 0
 					}
+				},
+				"trans_wall":
+				{
+					"parentId": "ds_origin",
+					"location":
+					{
+						"x": 400,
+						"y": 0,
+						"z": 400
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 0,
+						"roll": 0
+					}
+				},
+				"m_wall":
+				{
+					"parentId": "trans_wall",
+					"location":
+					{
+						"x": 350,
+						"y": -2.5827166609815322e-06,
+						"z": 20.768310546875
+					},
+					"rotation":
+					{
+						"pitch": 0,
+						"yaw": 90,
+						"roll": 90
+					}
 				}
 			},
 			"cameras":
 			{
 				"DefaultViewPoint":
 				{
-					"interpupillaryDistance": 6.4000000953674316,
+					"interpupillaryDistance": 35,
 					"swapEyes": false,
 					"stereoOffset": "none",
 					"parentId": "",
 					"location":
 					{
-						"x": 0,
+						"x": 10,
 						"y": 0,
 						"z": 180
 					},
@@ -113,6 +113,25 @@
 						"pitch": 0,
 						"yaw": 0,
 						"roll": 0
+					}
+				},
+				"Floor View Point":
+				{
+					"interpupillaryDistance": 6.4000000953674316,
+					"swapEyes": false,
+					"stereoOffset": "none",
+					"parentId": "",
+					"location":
+					{
+						"x": 350,
+						"y": -0,
+						"z": 600
+					},
+					"rotation":
+					{
+						"pitch": -90,
+						"yaw": 180,
+						"roll": 180
 					}
 				}
 			},
@@ -152,26 +171,26 @@
 			},
 			"network":
 			{
-				"ConnectRetriesAmount": "10",
+				"ConnectRetriesAmount": "300",
 				"ConnectRetryDelay": "1000",
-				"GameStartBarrierTimeout": "30000",
-				"FrameStartBarrierTimeout": "5000",
-				"FrameEndBarrierTimeout": "5000",
-				"RenderSyncBarrierTimeout": "5000"
+				"GameStartBarrierTimeout": "18000000",
+				"FrameStartBarrierTimeout": "1800000",
+				"FrameEndBarrierTimeout": "1800000",
+				"RenderSyncBarrierTimeout": "1800000"
 			},
 			"nodes":
 			{
 				"node_wall":
 				{
-					"host": "127.0.0.1",
+					"host": "192.168.19.114",
 					"sound": true,
-					"fullScreen": false,
+					"fullScreen": true,
 					"window":
 					{
 						"x": 0,
 						"y": 0,
-						"w": 960,
-						"h": 540
+						"w": 6467,
+						"h": 3830
 					},
 					"postprocess":
 					{
@@ -181,69 +200,6 @@
 						"vp_wall":
 						{
 							"camera": "DefaultViewPoint",
-							"bufferRatio": 1,
-							"gPUIndex": 1,
-							"textureShare":
-							{
-								"bIsEnabled": false,
-								"syncPolicy_Connection": 0,
-								"syncPolicy_Frame": 0,
-								"syncPolicy_Texture": 0
-							},
-							"overscan":
-							{
-								"mode": "none",
-								"left": 0,
-								"right": 0,
-								"top": 0,
-								"bottom": 0,
-								"oversize": true
-							},
-							"region":
-							{
-								"x": 0,
-								"y": 0,
-								"w": 960,
-								"h": 540
-							},
-							"projectionPolicy":
-							{
-								"type": "Mesh",
-								"parameters":
-								{
-									"mesh_component": "m_wall"
-								}
-							}
-						}
-					},
-					"outputRemap":
-					{
-						"bEnable": false,
-						"dataSource": "mesh",
-						"staticMeshAsset": "",
-						"externalFile": ""
-					}
-				},
-				"node_floor":
-				{
-					"host": "127.0.0.1",
-					"sound": false,
-					"fullScreen": false,
-					"window":
-					{
-						"x": 0,
-						"y": 540,
-						"w": 960,
-						"h": 540
-					},
-					"postprocess":
-					{
-					},
-					"viewports":
-					{
-						"vp_floor":
-						{
-							"camera": "",
 							"bufferRatio": 1,
 							"gPUIndex": -1,
 							"textureShare":
@@ -266,8 +222,71 @@
 							{
 								"x": 0,
 								"y": 0,
-								"w": 960,
-								"h": 540
+								"w": 6467,
+								"h": 3830
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "m_wall"
+								}
+							}
+						}
+					},
+					"outputRemap":
+					{
+						"bEnable": false,
+						"dataSource": "mesh",
+						"staticMeshAsset": "",
+						"externalFile": ""
+					}
+				},
+				"node_floor":
+				{
+					"host": "192.168.19.115",
+					"sound": false,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 6467,
+						"h": 3595
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_floor":
+						{
+							"camera": "Floor View Point",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"textureShare":
+							{
+								"bIsEnabled": false,
+								"syncPolicy_Connection": 0,
+								"syncPolicy_Frame": 0,
+								"syncPolicy_Texture": 0
+							},
+							"overscan":
+							{
+								"mode": "none",
+								"left": 0,
+								"right": 0,
+								"top": 0,
+								"bottom": 0,
+								"oversize": true
+							},
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 6467,
+								"h": 3595
 							},
 							"projectionPolicy":
 							{
@@ -291,13 +310,12 @@
 		},
 		"customParameters":
 		{
-			"SampleArg1": "SampleVal1"
 		},
 		"diagnostics":
 		{
 			"simulateLag": false,
 			"minLagTime": 0,
-			"maxLagTime": 0.5
+			"maxLagTime": 0
 		}
 	}
 }
