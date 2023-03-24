@@ -35,9 +35,9 @@ To start a new project, either use one of the included templates based on a [UE 
 
 When adding nDisplay to an existing project, create an empty root actor at position (0, 0, 0) in a level. Add the nDisplay files as child objects from the "/Content/DeepSpace/Switchboard" folder and reset the transform node to position (0, 0, 0). Ensure the nDisplay Actors have the "Actor Hidden In Game" property checked (Details Panel). Adjust the "Preview Screen Percentage" in the Editor Preview tab to suit your needs and performance, with the default value set to 0.25.
 
-* The nDisplay configuration files in the editor display settings for either desktop or DeepSpace, differing by IP address(es), projection surfaces, and viewport size. ![nDisplay DeepSpace configuration](./files/nDisplay_DeepSpace.png)
+* The nDisplay configuration files in the editor display settings for either desktop or DeepSpace, differing by IP address(es), projection surfaces, and viewport size. ![nDisplay DeepSpace configuration](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_DeepSpace.png)
 * Make changes to the panel cluster for the desktop files for testing purposes if required. Do not modify the DeepSpace nDisplay configurations, as this may cause the project to malfunction in DeepSpace.
-* Configuration files are loaded as ".uasset" in Unreal Engine. If you want to customize by extending a configuration file, ensure you export the configuration file to "/DeepSpaceStarter/Switchboard/". ![nDisplay configuration export](./files/nDisplay_export.png)
+* Configuration files are loaded as ".uasset" in Unreal Engine. If you want to customize by extending a configuration file, ensure you export the configuration file to "/DeepSpaceStarter/Switchboard/". ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
 * For further information on configuration possibilities, refer to the [nDisplay 3D Config Editor](https://docs.unrealengine.com/5.1/en-US/ndisplay-3d-config-editor-in-unreal-engine) documentation.
 
 ## Development
@@ -51,8 +51,8 @@ For productive use in DeepSpace, an *.ndisplay configuration file is required ("
 
 ### Package project
 Once the project configuration and setup are complete, it can be uploaded by technicians from the Ars Electronica museum staff or authorized individuals. Follow these recommended steps:
-* Open the Project Launcher ![nDisplay configuration export](./files/Build-Step-Project-Launcher.png)
-* Create custom profile ![nDisplay configuration export](./files/Build-Step-Create-New-Profile.png)
+* Open the Project Launcher ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Build-Step-Project-Launcher.png)
+* Create custom profile ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
 * Choose a appropriate  name for the new profile (each project has a profile)
 * The project should be automatically set
 * Build options can be set to "development" or "shipping"
