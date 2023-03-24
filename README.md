@@ -4,7 +4,7 @@
 2. [Overview](#overview)
 3. [Folder Structure](#folder-structure)
 4. [Configuration](#configuration)
-5. [Quickstart](#quickstart)
+5. [Quickstart Project with Switchboard](#quickstart-project-with-switchboard)
 6. [Switchboard Settings](#switchboard-settings)
 7. [Development](#development)
 8. [Production](#production)
@@ -53,7 +53,7 @@ When adding nDisplay to an existing project, create an empty root actor at posit
 * Configuration files are loaded as ".uasset" in Unreal Engine. If you want to customize by extending a configuration file, ensure you export the configuration file to "/DeepSpaceStarter/Switchboard/". ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
 * For further information on configuration possibilities, refer to the [nDisplay 3D Config Editor](https://docs.unrealengine.com/5.1/en-US/ndisplay-3d-config-editor-in-unreal-engine) documentation.
 
-## Quickstart
+## Quickstart Project with Switchboard
 * Download [UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
 * Open "/DeepSpaceStarter/DeepSpaceStarter.uproject"
 * Rebuild all Maps in "DeepSpaceStarter/Content/DeepSpace/Maps"
@@ -75,6 +75,7 @@ When adding nDisplay to an existing project, create an empty root actor at posit
   * Click "Start all connected Display devices"
 
 ## Switchboard Settings
+Additional information can be found at [Switchboard Settings Reference](https://docs.unrealengine.com/5.0/en-US/switchboard-settings-reference-for-unreal-engine/)
 * Switchboard
   * IP Address: 127.0.0.1
 * Multi User Server
@@ -93,6 +94,7 @@ When adding nDisplay to an existing project, create an empty root actor at posit
   * node_wall
     * IP address: 127.0.0.1
     * Unicast Endpoint: 127.0.0.1:0
+
 
 ## Development
 If there is no nDisplay experience it is recommended to have a look at the following tutorials:
