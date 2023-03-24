@@ -37,9 +37,35 @@ The project templates share the same structure, with main folders located in "Co
 * Settings: Configuration files for DeepSpace devices
 * Switchboard: nDisplay configuration files in "*.uasset" format and a mesh for floor and wall projection
 
+### Default DeepSpace Views
+#### Character Connected to the nDisplay Actor
+* The character/pawn view is controlled using a gamepad for movement and view
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CharacterMap.png)
+
+#### Camera Connected to the nDisplay Actor
+* A standard camera is connected, allowing movement and rotation control via its transformation
+  ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CinemaMap.png)
+
+#### Cinematic Actor Camera Connected to the nDisplay Actor
+DeepSpace View as a [In-Camera VFX](https://docs.unrealengine.com/5.1/en-US/in-camera-vfx-overview-in-unreal-engine)
+* Requires more performance when used for the entire screen
+* Utilize camera settings like FOV, aperture, etc.
+![Switchboard View Camera Map](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CameraMap.png)
+
+
+### Development with UE Pharus Plugin and Pharus Simulator
+2 Views (normal wall + floor view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-1.png)
+
+2 Views (wall = front view, floor = top down view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-2.png)
+
+2 Views (wall = front view, floor = top down view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-3.png)
+
 ## Folder Structure
-    \Build                      -> packaged application
-    \UE_ProjectName (optional)  -> for Testing recommended
+    \Build                      -> packaged application (empty if not packaged)
+    \DeepSpaceStarter           -> Starter Kit
     \Switchboard                -> must be untouched
     \project.json               -> set your startmap and the path to the application exe of your packaged game (relative).  
 
