@@ -1,12 +1,12 @@
 {
-    "startMap": "CinemaMap",
+    "startMap": "Pharus_StartMap",
     "version": "UE4.27",
     "wall": {
         "executable": "\\Build\\WindowsNoEditor\\DeepSpaceStarter.exe",
-        "nDisplay": "\\Switchboard\\nDisplay_Desktop.ndisplay"
+        "nDisplay": "\\Switchboard\\nDisplay_Desktop_2_Views.ndisplay"
     },
     "floor": {
         "executable": "\\Build\\WindowsNoEditor\\DeepSpaceStarter.exe",
-        "nDisplay": "\\Switchboard\\nDisplay_Desktop.ndisplay"
+        "nDisplay": "\\Switchboard\\nDisplay_Desktop_2_Views.ndisplay"
     }
 }
