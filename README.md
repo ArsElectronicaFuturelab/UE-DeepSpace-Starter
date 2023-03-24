@@ -6,16 +6,18 @@
 2. [Overview](#overview)
 3. [Folder Structure](#folder-structure)
 4. [Configuration](#configuration)
-5. [Development](#development)
-6. [Production](#production)
+5. [Quickstart](#quickstart)
+6. [Switchboard Settings](#switchboard-settings)
+7. [Development](#development)
+8. [Production](#production)
    1. [Package Project](#package-project)
    2. [Update project.json and project-test.json](#update-projectjson-and-project-testjson)
    3. [ZIP project](#zip-project)
-7. [Notes](#notes)
+9. [Notes](#notes)
    1. [Important Notes](#important-notes)
    2. [Notes on Unreal Engine Project Settings 4 & 5](#notes-on-unreal-engine-project-settings-4--5)
 
-# Quick links
+## Quick links
 Download UE DeepSpace Starter (Zips)
 * [UE 4.27 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27.2-DeepSpace-Starter.zip)
 * [UE 5.0 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
@@ -52,6 +54,47 @@ When adding nDisplay to an existing project, create an empty root actor at posit
 * Make changes to the panel cluster for the desktop files for testing purposes if required. Do not modify the DeepSpace nDisplay configurations, as this may cause the project to malfunction in DeepSpace.
 * Configuration files are loaded as ".uasset" in Unreal Engine. If you want to customize by extending a configuration file, ensure you export the configuration file to "/DeepSpaceStarter/Switchboard/". ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
 * For further information on configuration possibilities, refer to the [nDisplay 3D Config Editor](https://docs.unrealengine.com/5.1/en-US/ndisplay-3d-config-editor-in-unreal-engine) documentation.
+
+## Quickstart
+* Download [UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
+* Open "/DeepSpaceStarter/DeepSpaceStarter.uproject"
+* Rebuild all Maps in "DeepSpaceStarter/Content/DeepSpace/Maps"
+* Editor Preferences
+  * Reinstall Dependencies if necessary and create shortcuts on the desktop for "Switchboard" and "Switchboard Listener"
+  * Switchboard/Virtual Environment Path is the location of Switchboard
+  * Follow those steps if you run into any problems [Prerequisites](https://docs.unrealengine.com/5.0/en-US/switchboard-quick-start-for-unreal-engine)
+* UE Project (DeepSpaceStarter) runs in background
+* Start Switchboard (Desktop or "\Engine\Plugins\VirtualProduction\Switchboard\Source\Switchboard\Switchboard.bat")
+* Switchboard
+  * Configs/New config and hit ok (should be auto filled out)
+  * run Switchboard listener from the desktop or "Tools/Listener"
+  * Choose the "CinemaMap" in the "Level" select option
+  * Add Device/nDisplay Cluster
+    * Click "Populate"
+    * Choose "nDisplay_Desktop.uasset"
+  * Click the Stecker-Icon in the table header (connects to listener)
+  * nDisplay Monitor gets updated with the current nDisplay configuration
+  * Click "Start all connected Display devices"
+
+## Switchboard Settings
+* Switchboard
+  * IP Address: 127.0.0.1
+* Multi User Server
+  * Auto Launch: [ ]
+  * Clean History: [ ]
+  * Auto Build: [ ]
+  * Auto Endpoint: [ ]
+  * Unreal Multi-user Server Auto-join: []
+* nDisplay Settings
+  * Texture Streaming: [ ]
+  * Render API: dx 11
+  * Render Mode: Mono
+  * Render Sync policy: Config
+  * Minimize Before Launch: [ ]
+  * Unicast Endpoint: 127.0.0.1:0
+  * node_wall
+    * IP address: 127.0.0.1
+    * Unicast Endpoint: 127.0.0.1:0
 
 ## Development
 If there is no nDisplay experience it is recommended to have a look at the following tutorials:
