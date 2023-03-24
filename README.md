@@ -1,4 +1,20 @@
 # Unreal Engine - DeepSpace Starterkit
+
+
+# Table of Contents
+1. [Quick links](#quick-links)
+2. [Overview](#overview)
+3. [Folder Structure](#folder-structure)
+4. [Configuration](#configuration)
+5. [Development](#development)
+6. [Production](#production)
+   1. [Package Project](#package-project)
+   2. [Update project.json and project-test.json](#update-projectjson-and-project-testjson)
+   3. [ZIP project](#zip-project)
+7. [Notes](#notes)
+   1. [Important Notes](#important-notes)
+   2. [Notes on Unreal Engine Project Settings 4 & 5](#notes-on-unreal-engine-project-settings-4--5)
+
 # Quick links
 Download UE DeepSpace Starter (Zips)
 * [UE 4.27 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27.2-DeepSpace-Starter.zip)
@@ -9,20 +25,6 @@ Download UE Pharus DeepSpace Plugin
 * [UE 4.27 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-4.27-Pharus-Lasertracking-Plugin.zip)
 * [UE 5.0 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-5.0-Pharus-Lasertracking-Plugin.zip)
 * [UE 5.1 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-5.1-Pharus-Lasertracking-Plugin.zip)
-
-# Table of Contents
-1. [Overview](#overview)
-2. [Folder Structure](#folder-structure)
-3. [Configuration](#configuration)
-4. [Development](#development)
-5. [Production](#production)
-   1. [Package Project](#package-project)
-   2. [Update project.json and project-test.json](#update-projectjson-and-project-testjson)
-   3. [ZIP project](#zip-project)
-6. [Notes](#notes)
-   1. [Important Notes](#important-notes)
-   2. [Notes on Unreal Engine Project Settings 4 & 5](#notes-on-unreal-engine-project-settings-4--5)
-
 
 ## Overview
 The UE-DeepSpace-Starterkit is an Unreal Engine template designed specifically for the [Ars Electronica](https://ars.electronica.art/news/en/) museum's [DeepSpace](https://ars.electronica.art/center/en/exhibitions/deepspace), which features two large projection screens. The template supports [Unreal Engine](https://www.unrealengine.com/) versions 4.27.3 to 5.1.1 and includes [nDisplay](https://docs.unrealengine.com/4.26/en-US/WorkingWithMedia/nDisplay/Overview/) configuration files for both DeepSpace and standard PC/laptop (Devlopment & Testing) setups.
