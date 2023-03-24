@@ -1,7 +1,5 @@
 # Unreal Engine - DeepSpace Starterkit
-
-
-# Table of Contents
+## Table of Contents
 1. [Quick links](#quick-links)
 2. [Overview](#overview)
 3. [Folder Structure](#folder-structure)
@@ -63,16 +61,16 @@ When adding nDisplay to an existing project, create an empty root actor at posit
   * Reinstall Dependencies if necessary and create shortcuts on the desktop for "Switchboard" and "Switchboard Listener"
   * Switchboard/Virtual Environment Path is the location of Switchboard
   * Follow those steps if you run into any problems [Prerequisites](https://docs.unrealengine.com/5.0/en-US/switchboard-quick-start-for-unreal-engine)
-* UE Project (DeepSpaceStarter) runs in background
-* Start Switchboard (Desktop or "\Engine\Plugins\VirtualProduction\Switchboard\Source\Switchboard\Switchboard.bat")
+* Run UE Project (DeepSpaceStarter) in background
+* Start Switchboard (Desktop Shortcut or "\Engine\Plugins\VirtualProduction\Switchboard\Source\Switchboard\Switchboard.bat")
 * Switchboard
-  * Configs/New config and hit ok (should be auto filled out)
-  * run Switchboard listener from the desktop or "Tools/Listener"
+  * Configs/New config and click ok (should be auto filled out)
+  * Run Switchboard listener from the desktop or "Tools/Listener"
   * Choose the "CinemaMap" in the "Level" select option
   * Add Device/nDisplay Cluster
     * Click "Populate"
     * Choose "nDisplay_Desktop.uasset"
-  * Click the Stecker-Icon in the table header (connects to listener)
+  * Click the Plugin-Icon in the table header (connects to listener)
   * nDisplay Monitor gets updated with the current nDisplay configuration
   * Click "Start all connected Display devices"
 
