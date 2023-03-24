@@ -37,6 +37,28 @@ The project templates share the same structure, with main folders located in "Co
 * Settings: Configuration files for DeepSpace devices
 * Switchboard: nDisplay configuration files in "*.uasset" format and a mesh for floor and wall projection
 
+### Default Views
+
+Camera view is connected to the DeepSpace View
+![Switchboard View Camera Map](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CameraMap.png)
+
+Character user view is connected to the DeepSpace View
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CharacterMap.png)
+
+Cinematic actor camera is connected to the DeepSpace View as a [In-Camera VFX](https://docs.unrealengine.com/5.1/en-US/in-camera-vfx-overview-in-unreal-engine)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CinemaMap.png)
+
+### Development with UE Pharus Plugin and Pharus Simulator
+
+2 Views (normal wall + floor view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-1.png)
+
+2 Views (wall is front view, floor is top down view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-2.png)
+
+2 Views (wall is front view, floor is top down view)
+![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-3.png)
+
 ## Folder Structure
     \Build                      -> packaged application
     \UE_ProjectName (optional)  -> for Testing recommended
