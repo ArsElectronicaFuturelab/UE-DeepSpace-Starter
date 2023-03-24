@@ -43,8 +43,8 @@ The project templates share the same structure, with main folders located in "Co
 ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CharacterMap.png)
 
 #### Camera Connected to the nDisplay Actor
-![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CinemaMap.png)
 * A standard camera is connected, allowing movement and rotation control via its transformation
+  ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CinemaMap.png)
 
 #### Cinematic Actor Camera Connected to the nDisplay Actor
 DeepSpace View as a [In-Camera VFX](https://docs.unrealengine.com/5.1/en-US/in-camera-vfx-overview-in-unreal-engine)
