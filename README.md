@@ -53,15 +53,15 @@ Cinematic actor camera is connected to the DeepSpace View as a [In-Camera VFX](h
 2 Views (normal wall + floor view)
 ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-1.png)
 
-2 Views (wall is front view, floor is top down view)
+2 Views (wall = front view, floor = top down view)
 ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-2.png)
 
-2 Views (wall is front view, floor is top down view)
+2 Views (wall = front view, floor = top down view)
 ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-3.png)
 
 ## Folder Structure
-    \Build                      -> packaged application
-    \UE_ProjectName (optional)  -> for Testing recommended
+    \Build                      -> packaged application (empty if not packaged)
+    \DeepSpaceStarter           -> Starter Kit
     \Switchboard                -> must be untouched
     \project.json               -> set your startmap and the path to the application exe of your packaged game (relative).  
 
