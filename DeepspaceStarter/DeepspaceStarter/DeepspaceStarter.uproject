@@ -13,27 +13,22 @@
 			]
 		},
 		{
-			"Name": "OculusVR",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Win64"
-			]
+			"Name": "Switchboard",
+			"Enabled": true
+		},
+		{
+			"Name": "VaRest",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/e47be161e7a24e928560290abd5dcc4f"
 		},
 		{
 			"Name": "SteamVR",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
-				"Win64"
+				"Win32",
+				"Win64",
+				"Linux"
 			]
-		},
-		{
-			"Name": "Switchboard",
-			"Enabled": true
-		},
-		{
-			"Name": "DBJson",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/64d40a8dc7e44719839fb97ff6337110"
 		}
 	],
 	"TargetPlatforms": [
