@@ -1,6 +1,6 @@
-# Unreal Engine - DeepSpace Starterkit Test
+# Unreal Engine - DeepSpace Starterkit
 ## Table of Contents
-- [Unreal Engine - DeepSpace Starterkit Test](#unreal-engine---deepspace-starterkit-test)
+- [Unreal Engine - DeepSpace Starterkit](#unreal-engine---deepspace-starterkit)
   - [Table of Contents](#table-of-contents)
   - [Quick links](#quick-links)
   - [Overview](#overview)
