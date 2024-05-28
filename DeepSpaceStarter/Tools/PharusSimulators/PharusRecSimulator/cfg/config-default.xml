@@ -1,0 +1,12 @@
+<config>
+  <observationspace id="1" type="0" left="0.5" right="14.5" upper="10.5" lower="3"/>
+  <mappingspace left="0" right="15" upper="11" lower="2.7"/>
+  <tuiosender on="0" ip="127.0.0.1" port="3333" transmitechoes="1"/>
+  <oscsender on="1" ip="127.0.0.1" port="7000" transmitechoes="0"/>
+  <tracklink on="1" ip="127.0.0.1" port="44345" multicast="1"/>
+  <frontline on="0" ip="127.0.0.1" port="44350" columns="256"/>
+  <websocket on="0" ip="" port="44352"/>
+  <tracker confirmedechoes="1" trackconfidence="5" maxassignmentdistance="0.85" agility="0.5" orithresh="0.25" singleechomode="0" heading="0.2"/>
+  <echogenerator waitall="0" minObjectWidth="0.05" maxCorrelationDistance="0.36" innerObjectDistance="0.1" echoComputationMode="1"/>
+  <app trails="1" scanlines="0" echoes="0" fullscreen="0" width="1280" height="800" fov="0.25"/>
+</config>

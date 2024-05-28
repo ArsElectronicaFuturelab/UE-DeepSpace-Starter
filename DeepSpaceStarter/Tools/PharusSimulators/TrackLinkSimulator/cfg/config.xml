@@ -1,0 +1,6 @@
+<simulator>
+    <!-- screen dimensions in pixels, absolute dimensions in meters -->
+    <dimensions screenW="1600" screenH="900" absoluteW="15.0" absoluteH="10.5"/>
+    <track radius="20.0"/>
+    <tracklink multicast="0" ip="127.0.0.1" port="44345"/>
+</simulator>
