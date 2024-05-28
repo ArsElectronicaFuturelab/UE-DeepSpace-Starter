@@ -1,0 +1,8 @@
+{
+    "fileName": "pharus-floor-config.json",
+    "isEnabled": true,
+    "pharusTrackerBindNIC": "192.168.19.115",
+    "pharusPort": 44345,
+    "sizeX": 80,
+    "sizeY": 100.0
+}
