@@ -162,6 +162,7 @@ Update the project.json in the root folder based on the nDisplay_Configuration f
     * UE4.27
     * UE5.00
     * UE5.01
+    * UE5.03
 * Choose the the nDisplay configuration file from the folder "/DeepSpaceStarter/Switchboard" and replace  the content in" wall/nDisplay" and "floor/nDisplay"
 
 ### Zip project
