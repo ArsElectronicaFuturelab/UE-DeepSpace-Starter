@@ -141,7 +141,7 @@ For productive use in DeepSpace, an *.ndisplay configuration file is required ("
 ### Package project
 Once the project configuration and setup are complete, it can be uploaded by technicians from the Ars Electronica museum staff or authorized individuals. Follow these recommended steps:
 * Open the Project Launcher ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Build-Step-Project-Launcher.png)
-* Create custom profile ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
+* Create custom profile
 * Choose a appropriate  name for the new profile (each project has a profile)
 * The project should be automatically set
 * Build options can be set to "development" or "shipping"
