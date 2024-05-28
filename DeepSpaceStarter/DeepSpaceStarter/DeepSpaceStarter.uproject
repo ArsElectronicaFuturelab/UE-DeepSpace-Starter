@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.1",
+	"EngineAssociation": "5.3",
 	"Category": "",
 	"Description": "",
 	"Plugins": [
@@ -13,17 +13,20 @@
 			]
 		},
 		{
-			"Name": "OculusVR",
-			"Enabled": false,
+			"Name": "OpenXR",
+			"Enabled": true,
 			"SupportedTargetPlatforms": [
-				"Win64"
+				"Win64",
+				"Linux",
+				"Android"
 			]
 		},
 		{
-			"Name": "SteamVR",
-			"Enabled": false,
+			"Name": "VirtualScouting",
+			"Enabled": true,
 			"SupportedTargetPlatforms": [
-				"Win64"
+				"Win64",
+				"Linux"
 			]
 		},
 		{
@@ -31,9 +34,8 @@
 			"Enabled": true
 		},
 		{
-			"Name": "DBJson",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/64d40a8dc7e44719839fb97ff6337110"
+			"Name": "DisplayClusterLaunch",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
