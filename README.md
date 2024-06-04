@@ -45,6 +45,9 @@ The project templates share the same structure, with main folders located in "Co
 * Settings: Configuration files for DeepSpace devices
 * Switchboard: nDisplay configuration files in "*.uasset" format and a mesh for floor and wall projection
 
+### Prerequisites
+* Install *VaRest* from the Epic Games Marketplace. *VaRest* is used by the PHARUS tracking plugin.
+
 ### Default DeepSpace Views
 #### Character Connected to the nDisplay Actor
 * The character/pawn view is controlled using a gamepad for movement and view
