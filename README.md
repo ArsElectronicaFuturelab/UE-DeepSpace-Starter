@@ -22,11 +22,11 @@
     - [Important Notes](#important-notes)
     - [Notes on Unreal Engine Project Settings 4 \& 5](#notes-on-unreal-engine-project-settings-4--5)
 
-## Quick links
-Download UE DeepSpace Starter (Zips)
-* [UE 4.27 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27.2-DeepSpace-Starter.zip)
-* [UE 5.0 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
-* [UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip)
+## Quick links 
+Download UE DeepSpace Starter (Zips). [Deprecated] version should still work but will are not maintained anymore.
+* [[Deprecated] UE 4.27 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27.2-DeepSpace-Starter.zip)
+* [[Deprecated] UE 5.0 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
+* [[Deprecated] UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip)
 <!--- PHARUS is included in the UE-5.3 starter kit
 Download UE Pharus DeepSpace Plugin
 * [UE 4.27 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-4.27-Pharus-Lasertracking-Plugin.zip)
@@ -46,7 +46,7 @@ The project templates share the same structure, with main folders located in "Co
 * Switchboard: nDisplay configuration files in "*.uasset" format and a mesh for floor and wall projection
 
 ### Prerequisites
-* Install *VaRest* from the Epic Games Marketplace. *VaRest* is used by the PHARUS tracking plugin.
+* Install *VaRest* from the Epic Games Marketplace. *VaRest* is used by pharus tracking.
 
 ### Default DeepSpace Views
 #### Character Connected to the nDisplay Actor
@@ -64,7 +64,7 @@ DeepSpace View as a [In-Camera VFX](https://docs.unrealengine.com/5.1/en-US/in-c
 ![Switchboard View Camera Map](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CameraMap.png)
 
 
-### Development with UE Pharus Plugin and Pharus Simulator
+### Development with UE pharus and pharus Simulator
 2 Views (normal wall + floor view)
 ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-1.png)
 
