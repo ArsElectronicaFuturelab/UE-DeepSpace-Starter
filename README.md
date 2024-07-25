@@ -8,7 +8,7 @@
       - [Character Connected to the nDisplay Actor](#character-connected-to-the-ndisplay-actor)
       - [Camera Connected to the nDisplay Actor](#camera-connected-to-the-ndisplay-actor)
       - [Cinematic Actor Camera Connected to the nDisplay Actor](#cinematic-actor-camera-connected-to-the-ndisplay-actor)
-    - [Development with UE Pharus Plugin and Pharus Simulator](#development-with-ue-pharus-plugin-and-pharus-simulator)
+    - [Development with UE pharus and pharus Simulator](#development-with-ue-pharus-plugin-and-pharus-simulator)
   - [Folder Structure](#folder-structure)
   - [Configuration](#configuration)
   - [Quickstart Project with Switchboard](#quickstart-project-with-switchboard)
@@ -35,7 +35,7 @@ Download UE Pharus DeepSpace Plugin
 --->
 
 ## Overview
-The UE-DeepSpace Starterkit is an Unreal Engine template designed specifically for the [Ars Electronica](https://ars.electronica.art/news/en/) museum's [DeepSpace](https://ars.electronica.art/center/en/exhibitions/deepspace), which features two large projection screens. The template supports [Unreal Engine](https://www.unrealengine.com/) versions 4.27.3 to 5.1.1 and includes [nDisplay](https://docs.unrealengine.com/4.26/en-US/WorkingWithMedia/nDisplay/Overview/) configuration files for both DeepSpace and standard PC/laptop (Devlopment & Testing) setups.
+The UE-DeepSpace Starterkit is an Unreal Engine template designed specifically for the [Ars Electronica](https://ars.electronica.art/news/en/) museum's [DeepSpace](https://ars.electronica.art/center/en/exhibitions/deepspace), which features two large projection screens. The template supports [Unreal Engine](https://www.unrealengine.com/) versions 4.27.3 to 5.3.2 and includes [nDisplay](https://docs.unrealengine.com/4.26/en-US/WorkingWithMedia/nDisplay/Overview/) configuration files for both DeepSpace and standard PC/laptop (Devlopment & Testing) setups.
 
 The project templates share the same structure, with main folders located in "Content/DeepSpace":
 
