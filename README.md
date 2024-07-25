@@ -24,7 +24,7 @@
 
 ## Quick links 
 Download UE DeepSpace Starter (Zips). [Deprecated] version should still work but will are not maintained anymore.
-* [[Deprecated] UE 4.27.2 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27.2-DeepSpace-Starter.zip)
+* [[Deprecated] UE 4.27 DeepSpace Starter](https://codeload.github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/zip/refs/heads/UE-4.27-DeepSpace-Starter)
 * [[Deprecated] UE 5.0 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
 * [[Deprecated] UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip)
 <!--- PHARUS is included in the UE-5.3 starter kit
