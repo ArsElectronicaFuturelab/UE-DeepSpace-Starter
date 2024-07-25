@@ -8,7 +8,7 @@
       - [Character Connected to the nDisplay Actor](#character-connected-to-the-ndisplay-actor)
       - [Camera Connected to the nDisplay Actor](#camera-connected-to-the-ndisplay-actor)
       - [Cinematic Actor Camera Connected to the nDisplay Actor](#cinematic-actor-camera-connected-to-the-ndisplay-actor)
-    - [Development with UE pharus and pharus Simulator](#development-with-ue-pharus-plugin-and-pharus-simulator)
+    - [Development with UE pharus and pharus Simulator](#development-with-ue-pharus-and-pharus-simulator)
   - [Folder Structure](#folder-structure)
   - [Configuration](#configuration)
   - [Quickstart Project with Switchboard](#quickstart-project-with-switchboard)
