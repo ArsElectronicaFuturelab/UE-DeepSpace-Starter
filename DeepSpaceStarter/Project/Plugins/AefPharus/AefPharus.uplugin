@@ -1,0 +1,39 @@
+{
+	"FileVersion": 3,
+	"Version": 12,
+	"VersionName": "3.0.0",
+	"EngineVersion": "5.7.0",
+	"FriendlyName": "AefXR - Pharus Tracking",
+	"Description": "Advanced laser tracking system for Pharus hardware with multi-instance support, 3D room tracking (Floor + 4 Walls), and GameInstance Subsystem architecture. Features include thread-safe operation, smart pointer memory management, region-based coordinate mapping, and live configuration adjustment.",
+	"Category": "AefXR",
+	"CreatedBy": "Ars Electronica Futurelab - Johannes Lugstein|Friedrich Bachinger|Otto Naderer",
+	"CreatedByURL": "https://ars.electronica.art/futurelab/",
+	"DocsURL": "https://github.com/ArsElectronicaFuturelab/AefPharus/blob/main/README.md",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/ArsElectronicaFuturelab/AefPharus/issues",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AefPharus",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"Core",
+				"CoreUObject",
+				"Sockets",
+				"Networking"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "nDisplay",
+			"Enabled": true,
+			"Optional": true
+		}
+	]
+}
