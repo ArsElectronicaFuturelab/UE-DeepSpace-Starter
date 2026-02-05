@@ -1,12 +1,22 @@
 # Unreal Engine generated directories
-Binaries/
 Build/
 DerivedDataCache/
 Intermediate/
 Saved/
 
+# Project-level Binaries (regenerated on build)
+Project/Binaries/
+
+# Plugin Binaries - ALLOW DLLs and .modules for Blueprint distribution!
+# Only ignore build artifacts (.target files) and debug symbols (.pdb)
+Project/Plugins/**/Binaries/**/*.target
+Project/Plugins/**/Binaries/**/*.pdb
+# Explicitly include DLLs and .modules (essential for Blueprint projects)
+!Project/Plugins/**/Binaries/**/*.dll
+!Project/Plugins/**/Binaries/**/*.modules
+
 # Plugins (external, not version-controlled)
-Plugins/AefDeepSync/
+Project/Plugins/AefDeepSync/
 
 # Visual Studio / Rider
 .vs/
