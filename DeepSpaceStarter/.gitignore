@@ -1,1 +1,21 @@
-Build/*
+# Unreal Engine generated directories
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Plugins (external, not version-controlled)
+Plugins/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.sln
+*.suo
+*.user
+
+# Other
+*.log
+*.VC.db
+*.VC.opendb
