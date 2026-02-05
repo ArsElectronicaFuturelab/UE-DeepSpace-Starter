@@ -1,4 +1,6 @@
-# UE-DeepSpace-Starter
+# Unreal Engine 5 - DeepSpace-Starter
+
+[![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.7-blue)](https://unrealengine.com)
 
 Unreal Engine 5.7 project template for interactive installations with Pharus laser tracking and nDisplay cluster rendering.
 
