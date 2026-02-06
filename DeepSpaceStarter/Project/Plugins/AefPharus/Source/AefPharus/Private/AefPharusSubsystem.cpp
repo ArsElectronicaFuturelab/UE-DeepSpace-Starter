@@ -143,7 +143,7 @@ void UAefPharusSubsystem::Deinitialize()
 // Instance Management
 //--------------------------------------------------------------------------------
 
-FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPharusInstanceConfig& Config, TSubclassOf<AActor> SpawnClass)
+FAefPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FAefPharusInstanceConfig& Config, TSubclassOf<AActor> SpawnClass)
 {
 	// Debug logging - detailed input parameters
 	if (bIsPharusDebug)
@@ -166,7 +166,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Instance '%s' is disabled (bEnable = false)"), *Config.InstanceName.ToString());
 		UE_LOG(LogAefPharus, Warning, TEXT("%s"), *ErrorMsg);
-		FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::InstanceDisabled, ErrorMsg);
+		FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::InstanceDisabled, ErrorMsg);
 		if (bIsPharusDebug)
 		{
 			UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -181,7 +181,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Instance '%s' already exists"), *Config.InstanceName.ToString());
 		UE_LOG(LogAefPharus, Warning, TEXT("%s"), *ErrorMsg);
-		FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::InstanceAlreadyExists, ErrorMsg);
+		FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::InstanceAlreadyExists, ErrorMsg);
 		if (bIsPharusDebug)
 		{
 			UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -200,7 +200,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 			FString ErrorMsg = FString::Printf(TEXT("SpawnClass '%s' does not implement IAefPharusActorInterface - track IDs will not be set"),
 				*SpawnClass->GetName());
 			UE_LOG(LogAefPharus, Warning, TEXT("%s"), *ErrorMsg);
-			FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::SpawnClassMissingInterface, ErrorMsg);
+			FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::SpawnClassMissingInterface, ErrorMsg);
 			if (bIsPharusDebug)
 			{
 				UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -217,7 +217,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Failed to create UAefPharusInstance object for '%s'"), *Config.InstanceName.ToString());
 		UE_LOG(LogAefPharus, Error, TEXT("%s"), *ErrorMsg);
-		FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::InstanceCreationFailed, ErrorMsg);
+		FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::InstanceCreationFailed, ErrorMsg);
 		if (bIsPharusDebug)
 		{
 			UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -233,7 +233,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Cannot initialize instance '%s' - no valid World context"), *Config.InstanceName.ToString());
 		UE_LOG(LogAefPharus, Error, TEXT("%s"), *ErrorMsg);
-		FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::NoValidWorld, ErrorMsg);
+		FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::NoValidWorld, ErrorMsg);
 		if (bIsPharusDebug)
 		{
 			UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -247,7 +247,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Instance->Initialize() failed for '%s'"), *Config.InstanceName.ToString());
 		UE_LOG(LogAefPharus, Error, TEXT("%s"), *ErrorMsg);
-		FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::InitializationFailed, ErrorMsg);
+		FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::InitializationFailed, ErrorMsg);
 		if (bIsPharusDebug)
 		{
 			UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -270,7 +270,7 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 		SpawnClass ? *SpawnClass->GetName() : TEXT("None"));
 
 	// Debug logging - detailed result
-	FPharusCreateInstanceResult Result = FPharusCreateInstanceResult::MakeSuccess();
+	FAefPharusCreateInstanceResult Result = FAefPharusCreateInstanceResult::MakeSuccess();
 	if (bIsPharusDebug)
 	{
 		UE_LOG(LogAefPharus, Log, TEXT("========================================"));
@@ -283,19 +283,19 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstance(const FPh
 	return Result;
 }
 
-FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstanceSimple(
+FAefPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstanceSimple(
 	FName InstanceName,
 	FString BindNIC,
 	int32 UDPPort,
 	TSubclassOf<AActor> SpawnClass,
-	EPharusMappingMode MappingMode)
+	EAefPharusMappingMode MappingMode)
 {
 	// Validate SpawnClass
 	if (!SpawnClass)
 	{
 		FString ErrorMsg = FString::Printf(TEXT("Cannot create instance '%s' - SpawnClass is null"), *InstanceName.ToString());
 		UE_LOG(LogAefPharus, Error, TEXT("%s"), *ErrorMsg);
-		return FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::SpawnClassIsNull, ErrorMsg);
+		return FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::SpawnClassIsNull, ErrorMsg);
 	}
 
 	// Verify interface implementation (strict check for Simple variant)
@@ -304,11 +304,11 @@ FPharusCreateInstanceResult UAefPharusSubsystem::CreateTrackerInstanceSimple(
 		FString ErrorMsg = FString::Printf(TEXT("Cannot create instance '%s' - SpawnClass '%s' does not implement IAefPharusActorInterface"),
 			*InstanceName.ToString(), *SpawnClass->GetName());
 		UE_LOG(LogAefPharus, Error, TEXT("%s"), *ErrorMsg);
-		return FPharusCreateInstanceResult::MakeError(EPharusCreateInstanceError::SpawnClassMissingInterface, ErrorMsg);
+		return FAefPharusCreateInstanceResult::MakeError(EAefPharusCreateInstanceError::SpawnClassMissingInterface, ErrorMsg);
 	}
 
 	// Create config with sensible defaults
-	FPharusInstanceConfig Config;
+	FAefPharusInstanceConfig Config;
 	Config.InstanceName = InstanceName;
 	Config.bEnable = true;
 	Config.BindNIC = BindNIC;
@@ -750,11 +750,11 @@ void UAefPharusSubsystem::CreateInstancesFromConfig()
 		}
 
 		// Parse instance configuration
-		FPharusInstanceConfig Config = ParseInstanceConfigFromIni(SectionName);
+		FAefPharusInstanceConfig Config = ParseInstanceConfigFromIni(SectionName);
 		Config.InstanceName = FName(*TrimmedName);
 
 		// Create instance with SpawnClass
-		FPharusCreateInstanceResult Result = CreateTrackerInstance(Config, InstanceSpawnClass);
+		FAefPharusCreateInstanceResult Result = CreateTrackerInstance(Config, InstanceSpawnClass);
 		if (Result.bSuccess)
 		{
 			SuccessCount++;
@@ -808,10 +808,10 @@ void UAefPharusSubsystem::CreateInstancesFromConfig()
  * @param SectionName - INI section name (e.g., "Pharus.Floor", "Pharus.Wall")
  * @return Parsed configuration with defaults for missing/invalid properties
  */
-FPharusInstanceConfig UAefPharusSubsystem::ParseInstanceConfigFromIni(const FString& SectionName)
+FAefPharusInstanceConfig UAefPharusSubsystem::ParseInstanceConfigFromIni(const FString& SectionName)
 {
 	FString ConfigPath = GetConfigFilePath();
-	FPharusInstanceConfig Config;
+	FAefPharusInstanceConfig Config;
 
 	// Identity
 	GConfig->GetBool(*SectionName, TEXT("Enable"), Config.bEnable, ConfigPath);
@@ -828,17 +828,17 @@ FPharusInstanceConfig UAefPharusSubsystem::ParseInstanceConfigFromIni(const FStr
 	{
 		if (MappingModeStr.Equals(TEXT("Simple"), ESearchCase::IgnoreCase))
 		{
-			Config.MappingMode = EPharusMappingMode::Simple;
+			Config.MappingMode = EAefPharusMappingMode::Simple;
 		}
 		else if (MappingModeStr.Equals(TEXT("Regions"), ESearchCase::IgnoreCase))
 		{
-			Config.MappingMode = EPharusMappingMode::Regions;
+			Config.MappingMode = EAefPharusMappingMode::Regions;
 			Config.WallRegions = ParseWallRegionsFromIni(SectionName);
 		}
 		else
 		{
 			UE_LOG(LogAefPharus, Warning, TEXT("Unknown MappingMode '%s', defaulting to Simple"), *MappingModeStr);
-			Config.MappingMode = EPharusMappingMode::Simple;
+			Config.MappingMode = EAefPharusMappingMode::Simple;
 		}
 	}
 
@@ -954,14 +954,14 @@ FPharusInstanceConfig UAefPharusSubsystem::ParseInstanceConfigFromIni(const FStr
 	return Config;
 }
 
-TArray<FPharusWallRegion> UAefPharusSubsystem::ParseWallRegionsFromIni(const FString& BaseSectionName) const
+TArray<FAefPharusWallRegion> UAefPharusSubsystem::ParseWallRegionsFromIni(const FString& BaseSectionName) const
 {
-	TArray<FPharusWallRegion> Regions;
+	TArray<FAefPharusWallRegion> Regions;
 	TArray<FString> WallNames = {TEXT("Front"), TEXT("Left"), TEXT("Back"), TEXT("Right")};
 
 	for (const FString& WallName : WallNames)
 	{
-		FPharusWallRegion Region = ParseWallRegionFromIni(BaseSectionName, WallName);
+		FAefPharusWallRegion Region = ParseWallRegionFromIni(BaseSectionName, WallName);
 		Regions.Add(Region);
 	}
 
@@ -970,20 +970,20 @@ TArray<FPharusWallRegion> UAefPharusSubsystem::ParseWallRegionsFromIni(const FSt
 	return Regions;
 }
 
-FPharusWallRegion UAefPharusSubsystem::ParseWallRegionFromIni(const FString& SectionName, const FString& WallName) const
+FAefPharusWallRegion UAefPharusSubsystem::ParseWallRegionFromIni(const FString& SectionName, const FString& WallName) const
 {
 	FString ConfigPath = GetConfigFilePath();
-	FPharusWallRegion Region;
+	FAefPharusWallRegion Region;
 
 	// Determine wall side
 	if (WallName.Equals(TEXT("Front")))
-		Region.WallSide = EPharusWallSide::Front;
+		Region.WallSide = EAefPharusWallSide::Front;
 	else if (WallName.Equals(TEXT("Left")))
-		Region.WallSide = EPharusWallSide::Left;
+		Region.WallSide = EAefPharusWallSide::Left;
 	else if (WallName.Equals(TEXT("Back")))
-		Region.WallSide = EPharusWallSide::Back;
+		Region.WallSide = EAefPharusWallSide::Back;
 	else if (WallName.Equals(TEXT("Right")))
-		Region.WallSide = EPharusWallSide::Right;
+		Region.WallSide = EAefPharusWallSide::Right;
 
 	// Build key prefix
 	FString Prefix = FString::Printf(TEXT("Wall.%s."), *WallName);
@@ -1149,7 +1149,7 @@ FString UAefPharusSubsystem::GetConfigFilePath() const
 // Configuration Reading from Disk
 //--------------------------------------------------------------------------------
 
-bool UAefPharusSubsystem::GetFloorSettingsFromDisk(FName InstanceName, FPharusInstanceConfig& OutConfig) const
+bool UAefPharusSubsystem::GetFloorSettingsFromDisk(FName InstanceName, FAefPharusInstanceConfig& OutConfig) const
 {
 	// Build config file path
 	FString ConfigPath = GetConfigFilePath();
@@ -1163,7 +1163,7 @@ bool UAefPharusSubsystem::GetFloorSettingsFromDisk(FName InstanceName, FPharusIn
 	FString SectionName = FString::Printf(TEXT("Pharus.%s"), *InstanceName.ToString());
 
 	// Read Floor settings from disk (only settings that are in AefConfig.ini)
-	FPharusInstanceConfig DiskConfig;
+	FAefPharusInstanceConfig DiskConfig;
 	DiskConfig.InstanceName = InstanceName;
 
 	// Basic Settings
@@ -1173,7 +1173,7 @@ bool UAefPharusSubsystem::GetFloorSettingsFromDisk(FName InstanceName, FPharusIn
 	if (GConfig->GetString(*SectionName, TEXT("MappingMode"), MappingModeStr, ConfigPath))
 	{
 		if (MappingModeStr.Equals(TEXT("Simple"), ESearchCase::IgnoreCase))
-			DiskConfig.MappingMode = EPharusMappingMode::Simple;
+			DiskConfig.MappingMode = EAefPharusMappingMode::Simple;
 	}
 
 	// Network Configuration
@@ -1280,7 +1280,7 @@ bool UAefPharusSubsystem::GetFloorSettingsFromDisk(FName InstanceName, FPharusIn
 	return true;
 }
 
-bool UAefPharusSubsystem::GetWallSettingsFromDisk(FName InstanceName, FPharusInstanceConfig& OutConfig) const
+bool UAefPharusSubsystem::GetWallSettingsFromDisk(FName InstanceName, FAefPharusInstanceConfig& OutConfig) const
 {
 	// Build config file path
 	FString ConfigPath = GetConfigFilePath();
@@ -1294,7 +1294,7 @@ bool UAefPharusSubsystem::GetWallSettingsFromDisk(FName InstanceName, FPharusIns
 	FString SectionName = FString::Printf(TEXT("Pharus.%s"), *InstanceName.ToString());
 
 	// Read Wall settings from disk (only settings that are in AefConfig.ini)
-	FPharusInstanceConfig DiskConfig;
+	FAefPharusInstanceConfig DiskConfig;
 	DiskConfig.InstanceName = InstanceName;
 
 	// Basic Settings
@@ -1305,7 +1305,7 @@ bool UAefPharusSubsystem::GetWallSettingsFromDisk(FName InstanceName, FPharusIns
 	{
 		if (MappingModeStr.Equals(TEXT("Regions"), ESearchCase::IgnoreCase))
 		{
-			DiskConfig.MappingMode = EPharusMappingMode::Regions;
+			DiskConfig.MappingMode = EAefPharusMappingMode::Regions;
 			// Parse wall regions for proper 3D normalization
 			DiskConfig.WallRegions = ParseWallRegionsFromIni(SectionName);
 		}

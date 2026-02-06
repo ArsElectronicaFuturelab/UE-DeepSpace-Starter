@@ -57,8 +57,8 @@ public:
 	 * @param SpawnClass Optional actor class to spawn for tracks (overrides Config.SpawnClass if set)
 	 * @return Result struct with success status, error code, and detailed error message
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
-	FPharusCreateInstanceResult CreateTrackerInstance(const FPharusInstanceConfig& Config,
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
+	FAefPharusCreateInstanceResult CreateTrackerInstance(const FAefPharusInstanceConfig& Config,
 		UPARAM(meta = (MustImplement = "/Script/AefPharus.AefPharusActorInterface")) TSubclassOf<AActor> SpawnClass = nullptr);
 
 	/**
@@ -71,13 +71,13 @@ public:
 	 * @param MappingMode Coordinate mapping mode (Simple for floor, Regions for walls)
 	 * @return Result struct with success status, error code, and detailed error message
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
-	FPharusCreateInstanceResult CreateTrackerInstanceSimple(
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
+	FAefPharusCreateInstanceResult CreateTrackerInstanceSimple(
 		FName InstanceName,
 		FString BindNIC,
 		int32 UDPPort,
 		UPARAM(meta = (MustImplement = "/Script/AefPharus.AefPharusActorInterface")) TSubclassOf<AActor> SpawnClass,
-		EPharusMappingMode MappingMode = EPharusMappingMode::Simple
+		EAefPharusMappingMode MappingMode = EAefPharusMappingMode::Simple
 	);
 
 	/**
@@ -85,7 +85,7 @@ public:
 	 * @param InstanceName Name of the instance to retrieve
 	 * @return Tracker instance, or nullptr if not found
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	UAefPharusInstance* GetTrackerInstance(FName InstanceName);
 
 	/**
@@ -93,25 +93,25 @@ public:
 	 * @param InstanceName Name of the instance to remove
 	 * @return true if instance was removed
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	bool RemoveTrackerInstance(FName InstanceName);
 
 	/**
 	 * Get all active tracker instance names
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	TArray<FName> GetAllInstanceNames() const;
 
 	/**
 	 * Get the number of active tracker instances
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	int32 GetInstanceCount() const;
 
 	/**
 	 * Check if an instance with the given name exists
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool HasInstance(FName InstanceName) const;
 
 	/**
@@ -121,7 +121,7 @@ public:
 	 * @param InstanceName Name of the instance (e.g., "Floor", "Wall")
 	 * @param SpawnClass Actor class to spawn (must implement IAefPharusActorInterface)
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	void SetSpawnClassOverride(FName InstanceName,
 		UPARAM(meta = (MustImplement = "/Script/AefPharus.AefPharusActorInterface")) TSubclassOf<AActor> SpawnClass);
 
@@ -130,7 +130,7 @@ public:
 	 * This allows manual control over when Pharus tracking begins
 	 * @return true if instances were created successfully
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	bool StartPharusSystem();
 
 	/**
@@ -138,14 +138,14 @@ public:
 	 * This stops all tracking and destroys all spawned actors
 	 * @return true if system was stopped successfully
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	bool StopPharusSystem();
 
 	/**
 	 * Check if the Pharus system is currently running
 	 * @return true if at least one instance is active
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool IsPharusSystemRunning() const;
 
 	/**
@@ -155,16 +155,16 @@ public:
 	 * @param TrackID Track ID to check
 	 * @return true if track is active in the specified instance
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool IsTrackActive(FName InstanceName, int32 TrackID) const;
 
 	/**
 	* Debug flag for Pharus
 	*/
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool GetIsPharusDebug();
 
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	void SetIsPharusDebug(bool bNewValue);
 
 	/**
@@ -174,8 +174,8 @@ public:
 	 * @param OutConfig Configuration structure with all floor settings
 	 * @return true if settings were successfully read from disk
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Floor")
-	bool GetFloorSettingsFromDisk(FName InstanceName, FPharusInstanceConfig& OutConfig) const;
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Floor")
+	bool GetFloorSettingsFromDisk(FName InstanceName, FAefPharusInstanceConfig& OutConfig) const;
 
 	/**
 	 * Get current Wall settings directly from disk (Config/AefConfig.ini)
@@ -184,8 +184,8 @@ public:
 	 * @param OutConfig Configuration structure with all wall settings
 	 * @return true if settings were successfully read from disk
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Wall")
-	bool GetWallSettingsFromDisk(FName InstanceName, FPharusInstanceConfig& OutConfig) const;
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Wall")
+	bool GetWallSettingsFromDisk(FName InstanceName, FAefPharusInstanceConfig& OutConfig) const;
 
 	//--------------------------------------------------------------------------------
 	// Global Root Origin Management
@@ -197,7 +197,7 @@ public:
 	 * Use this for static origins or when origin is controlled programmatically
 	 * @param Origin The origin point in world space (cm)
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Origin")
 	void SetRootOrigin(FVector Origin);
 
 	/**
@@ -206,7 +206,7 @@ public:
 	 * otherwise returns the manually set RootOrigin from config or SetRootOrigin()
 	 * @return Current origin in world space (cm)
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	FVector GetRootOrigin() const;
 
 	/**
@@ -215,7 +215,7 @@ public:
 	 * otherwise returns the manually set RootRotation from config or SetRootOriginRotation()
 	 * @return Current rotation in world space
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	FRotator GetRootOriginRotation() const;
 
 	/**
@@ -223,21 +223,21 @@ public:
 	 * Use this for static rotations or when origin is controlled programmatically
 	 * @param Rotation The rotation in world space
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Origin")
 	void SetRootOriginRotation(FRotator Rotation);
 
 	/**
 	 * Check if a valid root origin is configured
 	 * @return true if RootOriginActor is valid OR RootOrigin was configured
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	bool HasValidRootOrigin() const;
 
 	/**
 	 * Check if using a placed RootOriginActor for dynamic origin
 	 * @return true if UsePharusRootOriginActor=true in config
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	bool IsUsingRootOriginActor() const;
 
 	/**
@@ -259,14 +259,14 @@ public:
 	 * Get the registered RootOriginActor (if any)
 	 * @return The registered actor, or nullptr if not using dynamic origin
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	AAefPharusRootOriginActor* GetRootOriginActor() const;
 
 	/**
 	 * Check if relative spawning is active
 	 * @return true if UseRelativeSpawning=true AND UsePharusRootOriginActor=true AND actor is valid
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	bool IsRelativeSpawningActive() const;
 
 private:
@@ -335,14 +335,14 @@ private:
 	 * @param SectionName INI section name (e.g., "Pharus.Floor")
 	 * @return Parsed configuration
 	 */
-	FPharusInstanceConfig ParseInstanceConfigFromIni(const FString& SectionName);
+	FAefPharusInstanceConfig ParseInstanceConfigFromIni(const FString& SectionName);
 
 	/**
 	 * Parse wall region configurations from INI
 	 * @param BaseSectionName Base section name (e.g., "Pharus.Wall")
 	 * @return Array of parsed wall regions
 	 */
-	TArray<FPharusWallRegion> ParseWallRegionsFromIni(const FString& BaseSectionName) const;
+	TArray<FAefPharusWallRegion> ParseWallRegionsFromIni(const FString& BaseSectionName) const;
 
 	/**
 	 * Parse a single wall region from INI
@@ -350,7 +350,7 @@ private:
 	 * @param WallName Wall name (e.g., "Front", "Left", "Back", "Right")
 	 * @return Parsed wall region
 	 */
-	FPharusWallRegion ParseWallRegionFromIni(const FString& SectionName, const FString& WallName) const;
+	FAefPharusWallRegion ParseWallRegionFromIni(const FString& SectionName, const FString& WallName) const;
 
 	//--------------------------------------------------------------------------------
 	// Helper Functions
@@ -361,3 +361,4 @@ private:
 	 */
 	FString GetConfigFilePath() const;
 };
+

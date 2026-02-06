@@ -112,28 +112,28 @@ public:
 	 * Get the track ID this actor represents
 	 * @return Track ID, or -1 if not set
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	int32 GetTrackID() const { return TrackID; }
 
 	/**
 	 * Get the tracker instance name this actor belongs to
 	 * @return Instance name (e.g., "Floor", "Wall"), or None if not set
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	FName GetInstanceName() const { return InstanceName; }
 
 	/**
 	 * Check if this actor has a valid track ID
 	 * @return true if track ID is valid (>= 0)
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool HasValidTrackID() const { return TrackID >= 0; }
 
 	/**
 	 * Check if this actor has valid tracker instance context
 	 * @return true if instance name is set
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool HasValidInstanceName() const { return InstanceName != NAME_None; }
 
 	/**
@@ -142,7 +142,7 @@ public:
 	 * Useful for self-validation to detect if simulator stopped sending data
 	 * @return true if track is still receiving UDP updates, false if timed out or lost
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool IsMyTrackActive() const;
 
 protected:
@@ -150,7 +150,7 @@ protected:
 	 * The Pharus track ID this actor represents
 	 * Set by tracker instance via SetActorTrackID() or SetActorTrackInfo()
 	 */
-	UPROPERTY(BlueprintReadOnly, Category = "AefXR|Pharus")
+	UPROPERTY(BlueprintReadOnly, Category = "AEF|Pharus")
 	int32 TrackID;
 
 	/**
@@ -158,21 +158,21 @@ protected:
 	 * Set by tracker instance via SetActorTrackInfo() (e.g., "Floor", "Wall")
 	 * Enables actors to self-validate and know which instance they belong to
 	 */
-	UPROPERTY(BlueprintReadOnly, Category = "AefXR|Pharus")
+	UPROPERTY(BlueprintReadOnly, Category = "AEF|Pharus")
 	FName InstanceName;
 
 	/**
 	 * Blueprint event called when track ID is set
 	 * Override this in Blueprint to react to track assignment
 	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "AefXR|Pharus", meta = (DisplayName = "On Track ID Set"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "AEF|Pharus", meta = (DisplayName = "On Track ID Set"))
 	void OnTrackIDSet(int32 NewTrackID);
 
 	/**
 	 * Blueprint event called when track info is set (extended version)
 	 * Override this in Blueprint to react to track assignment with full context
 	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "AefXR|Pharus", meta = (DisplayName = "On Track Info Set"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "AEF|Pharus", meta = (DisplayName = "On Track Info Set"))
 	void OnTrackInfoSet(int32 NewTrackID, FName NewInstanceName);
 
 	/**
@@ -180,13 +180,14 @@ protected:
 	 * Override this in Blueprint to initialize visuals, start animations, etc.
 	 * Only fires for valid tracks (TrackID >= 0), NOT for pool initialization
 	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "AefXR|Pharus|Events", meta = (DisplayName = "On Track Connected"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "AEF|Pharus|Events", meta = (DisplayName = "On Track Connected"))
 	void BP_OnTrackConnected(int32 ConnectedTrackID, FName ConnectedInstanceName);
 
 	/**
 	 * Blueprint event called when actor's track is lost
 	 * Override this in Blueprint to cleanup, stop animations, trigger effects, etc.
 	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "AefXR|Pharus|Events", meta = (DisplayName = "On Track Lost"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "AEF|Pharus|Events", meta = (DisplayName = "On Track Lost"))
 	void BP_OnTrackLost(int32 LostTrackID, FName LostInstanceName, const FString& LostReason);
 };
+

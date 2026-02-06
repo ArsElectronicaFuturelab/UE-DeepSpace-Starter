@@ -96,21 +96,21 @@ public:
 	 * Get the current origin position in world space
 	 * @return World position of this root origin actor (cm)
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	FVector GetOriginLocation() const;
 
 	/**
 	 * Get the current origin rotation in world space
 	 * @return World rotation of this root origin actor
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	FRotator GetOriginRotation() const;
 
 	/**
 	 * Check if this actor is currently registered as the active origin
 	 * @return true if registered with subsystem
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Origin")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Origin")
 	bool IsRegisteredAsOrigin() const;
 
 protected:
@@ -127,7 +127,7 @@ protected:
 	 * - Primary node sets the actor position
 	 * - Secondary nodes automatically receive the synchronized transform
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AefXR|Pharus|Cluster")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEF|Pharus|Cluster")
 	class USceneComponent* ClusterSyncRoot;
 
 #if WITH_EDITORONLY_DATA
@@ -135,14 +135,14 @@ protected:
 	 * Billboard component for editor visibility
 	 * Shows a visual marker at the origin position in the editor
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "AefXR|Pharus|Debug")
+	UPROPERTY(VisibleAnywhere, Category = "AEF|Pharus|Debug")
 	class UBillboardComponent* EditorBillboard;
 
 	/**
 	 * Arrow component showing forward direction (X-axis)
 	 * Helps visualize the coordinate system orientation
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "AefXR|Pharus|Debug")
+	UPROPERTY(VisibleAnywhere, Category = "AEF|Pharus|Debug")
 	class UArrowComponent* ForwardArrow;
 #endif
 
@@ -150,3 +150,4 @@ private:
 	/** Cached registration status */
 	bool bIsRegistered = false;
 };
+

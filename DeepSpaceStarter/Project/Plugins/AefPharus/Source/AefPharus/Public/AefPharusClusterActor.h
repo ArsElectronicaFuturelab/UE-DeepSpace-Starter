@@ -82,6 +82,7 @@ protected:
 	 * Note: If DisplayCluster is not available, this will be nullptr and
 	 * a standard USceneComponent will be used as RootComponent instead.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AefXR|Pharus|Cluster")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEF|Pharus|Cluster")
 	class USceneComponent* ClusterSyncComponent;
 };
+

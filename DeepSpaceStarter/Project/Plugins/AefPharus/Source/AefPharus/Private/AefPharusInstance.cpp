@@ -52,7 +52,7 @@ UAefPharusInstance::~UAefPharusInstance()
 // Lifecycle
 //--------------------------------------------------------------------------------
 
-bool UAefPharusInstance::Initialize(const FPharusInstanceConfig& InConfig, UWorld* InWorld, TSubclassOf<AActor> InSpawnClass)
+bool UAefPharusInstance::Initialize(const FAefPharusInstanceConfig& InConfig, UWorld* InWorld, TSubclassOf<AActor> InSpawnClass)
 {
 	if (bIsRunning)
 	{
@@ -256,7 +256,7 @@ void UAefPharusInstance::onTrackNew(const pharus::TrackRecord& Track)
 		// Still add to TrackDataCache for timeout tracking!
 		TracksOutsideBounds.Add(Track.trackID);
 		
-		FPharusTrackData TrackData;
+		FAefPharusTrackData TrackData;
 		TrackData.TrackID = Track.trackID;
 		TrackData.LastUpdateTime = FPlatformTime::Seconds();
 		TrackData.bIsInsideBoundary = false;  // Outside bounds
@@ -275,7 +275,7 @@ void UAefPharusInstance::onTrackNew(const pharus::TrackRecord& Track)
 
 	// Track is valid - spawn actor
 	const FVector WorldPos = TrackToWorld(InputPos, Track);
-	const FPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
+	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
 
 	PendingSpawns.AddUnique(Track.trackID);
 	TrackDataCache.Add(Track.trackID, TrackData);
@@ -303,7 +303,7 @@ void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 	if (!bIsValid)
 	{
 		// Track is outside valid bounds - always update timestamp for timeout tracking
-		FPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
+		FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
 		if (ExistingData)
 		{
 			ExistingData->LastUpdateTime = FPlatformTime::Seconds();
@@ -312,7 +312,7 @@ void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 		else
 		{
 			// Track not in cache yet - add it for timeout tracking
-			FPharusTrackData TrackData;
+			FAefPharusTrackData TrackData;
 			TrackData.TrackID = Track.trackID;
 			TrackData.LastUpdateTime = FPlatformTime::Seconds();
 			TrackData.bIsInsideBoundary = false;  // Outside bounds
@@ -345,7 +345,7 @@ void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 		TracksOutsideBounds.Remove(Track.trackID);
 		
 		const FVector WorldPos = TrackToWorld(InputPos, Track);
-		const FPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
+		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
 		
 		PendingSpawns.AddUnique(Track.trackID);
 		TrackDataCache.Add(Track.trackID, TrackData);
@@ -360,12 +360,12 @@ void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 
 	// Track is inside and was inside - normal update path
 	// Update LastUpdateTime to prevent timeout on static tracks
-	FPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
+	FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
 	if (!ExistingData)
 	{
 		// Edge case: Track was never properly spawned, spawn it now
 		const FVector WorldPos = TrackToWorld(InputPos, Track);
-		const FPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
+		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
 		
 		PendingSpawns.AddUnique(Track.trackID);
 		TrackDataCache.Add(Track.trackID, TrackData);
@@ -382,7 +382,7 @@ void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 
 	// ALWAYS recalculate world position (RootOrigin/RootRotation may have changed)
 	const FVector WorldPos = TrackToWorld(InputPos, Track);
-	const FPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
+	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
 	
 	// Update the cached data (so actor always has correct position relative to RootOrigin)
 	TrackDataCache.FindOrAdd(Track.trackID) = TrackData;
@@ -426,7 +426,7 @@ void UAefPharusInstance::onTrackLost(const pharus::TrackRecord& Track)
 bool UAefPharusInstance::GetTrackData(int32 TrackID, FVector& OutPosition, FRotator& OutRotation, bool& bOutIsInsideBoundary)
 {
 	FScopeLock Lock(&PendingOperationsMutex);
-	FPharusTrackData* Data = TrackDataCache.Find(TrackID);
+	FAefPharusTrackData* Data = TrackDataCache.Find(TrackID);
 	if (!Data)
 	{
 		return false;
@@ -473,7 +473,7 @@ bool UAefPharusInstance::IsTrackActive(int32 TrackID) const
 // Configuration
 //--------------------------------------------------------------------------------
 
-bool UAefPharusInstance::UpdateConfig(const FPharusInstanceConfig& NewConfig)
+bool UAefPharusInstance::UpdateConfig(const FAefPharusInstanceConfig& NewConfig)
 {
 	if (!Config.bLiveAdjustments)
 	{
@@ -497,7 +497,7 @@ bool UAefPharusInstance::UpdateConfig(const FPharusInstanceConfig& NewConfig)
 	return true;
 }
 
-bool UAefPharusInstance::UpdateFloorSettings(const FPharusInstanceConfig& NewConfig)
+bool UAefPharusInstance::UpdateFloorSettings(const FAefPharusInstanceConfig& NewConfig)
 {
 	if (!Config.bLiveAdjustments)
 	{
@@ -558,7 +558,7 @@ bool UAefPharusInstance::UpdateFloorSettingsSimple(float OriginX, float OriginY,
 	return true;
 }
 
-bool UAefPharusInstance::UpdateWallSettings(const FPharusInstanceConfig& NewConfig)
+bool UAefPharusInstance::UpdateWallSettings(const FAefPharusInstanceConfig& NewConfig)
 {
 	if (!Config.bLiveAdjustments)
 	{
@@ -629,7 +629,7 @@ bool UAefPharusInstance::RestartWithNewNetwork(const FString& NewBindNIC, int32 
 	// Save important state before shutdown
 	TSubclassOf<AActor> SavedSpawnClass = SpawnClass;
 	UWorld* SavedWorldContext = WorldContext;
-	FPharusInstanceConfig SavedConfig = Config;
+	FAefPharusInstanceConfig SavedConfig = Config;
 
 	// Update network settings in config
 	SavedConfig.BindNIC = NewBindNIC;
@@ -663,12 +663,12 @@ FVector UAefPharusInstance::TrackToWorld(const FVector2D& TrackPos, const pharus
 {
 	switch (Config.MappingMode)
 	{
-		case EPharusMappingMode::Simple:
+		case EAefPharusMappingMode::Simple:
 			return TrackToWorldFloor(TrackPos);
 
-		case EPharusMappingMode::Regions:
+		case EAefPharusMappingMode::Regions:
 		{
-			EPharusWallSide Wall;
+			EAefPharusWallSide Wall;
 			return TrackToWorldRegions(TrackPos, Wall);
 		}
 
@@ -786,7 +786,7 @@ FRotator UAefPharusInstance::GetRootOriginRotation() const
 	return FRotator::ZeroRotator;
 }
 
-FVector UAefPharusInstance::TrackToWorldRegions(const FVector2D& TrackPos, EPharusWallSide& OutWall) const
+FVector UAefPharusInstance::TrackToWorldRegions(const FVector2D& TrackPos, EAefPharusWallSide& OutWall) const
 {
 	// Handle coordinate normalization based on explicit flag
 	FVector2D NormalizedPos = TrackPos;
@@ -810,13 +810,13 @@ FVector UAefPharusInstance::TrackToWorldRegions(const FVector2D& TrackPos, EPhar
 	// Find matching wall region
 	// NOTE: IsTrackPositionValid() should have already rejected invalid positions,
 	//       so this should always find a region. This is a safety fallback.
-	const FPharusWallRegion* Region = FindWallRegion(NormalizedPos);
+	const FAefPharusWallRegion* Region = FindWallRegion(NormalizedPos);
 	if (!Region)
 	{
 		// This should never happen if IsTrackPositionValid() was called first
 		UE_LOG(LogAefPharus, Error, TEXT("[%s] Track position (%.3f, %.3f) outside all wall regions - this should have been rejected earlier!"),
 			*Config.InstanceName.ToString(), TrackPos.X, TrackPos.Y);
-		OutWall = EPharusWallSide::Floor;
+		OutWall = EAefPharusWallSide::Floor;
 		return FVector::ZeroVector;
 	}
 
@@ -836,18 +836,18 @@ FVector UAefPharusInstance::TrackToWorldRegions(const FVector2D& TrackPos, EPhar
 	return Region->TrackToWorld(NormalizedPos, RootOrigin, RootRotation, Config.WallRotation);
 }
 
-const FPharusWallRegion* UAefPharusInstance::FindWallRegion(const FVector2D& TrackPos) const
+const FAefPharusWallRegion* UAefPharusInstance::FindWallRegion(const FVector2D& TrackPos) const
 {
 	// Debug: Log number of wall regions
 	UE_LOG(LogAefPharus, Verbose, TEXT("[%s] Checking %d wall regions for position (%.3f, %.3f)"),
 		*Config.InstanceName.ToString(), Config.WallRegions.Num(), TrackPos.X, TrackPos.Y);
 
 	// Check all regions and collect matches (due to overlapping regions)
-	TArray<const FPharusWallRegion*> MatchingRegions;
+	TArray<const FAefPharusWallRegion*> MatchingRegions;
 
 	for (int32 i = 0; i < Config.WallRegions.Num(); ++i)
 	{
-		const FPharusWallRegion& Region = Config.WallRegions[i];
+		const FAefPharusWallRegion& Region = Config.WallRegions[i];
 		bool bContains = Region.ContainsTrackPoint(TrackPos);
 
 		UE_LOG(LogAefPharus, Verbose, TEXT("  Region %d (%s): Bounds=(%.3f-%.3f, %.3f-%.3f) Contains=%s"),
@@ -876,27 +876,27 @@ const FPharusWallRegion* UAefPharusInstance::FindWallRegion(const FVector2D& Tra
 
 	// Multiple regions match (corner case) - use priority logic
 	// Priority: Front > Right > Back > Left (clockwise priority)
-	for (const FPharusWallRegion* Region : MatchingRegions)
+	for (const FAefPharusWallRegion* Region : MatchingRegions)
 	{
-		if (Region->WallSide == EPharusWallSide::Front)
+		if (Region->WallSide == EAefPharusWallSide::Front)
 			return Region;
 	}
 
-	for (const FPharusWallRegion* Region : MatchingRegions)
+	for (const FAefPharusWallRegion* Region : MatchingRegions)
 	{
-		if (Region->WallSide == EPharusWallSide::Right)
+		if (Region->WallSide == EAefPharusWallSide::Right)
 			return Region;
 	}
 
-	for (const FPharusWallRegion* Region : MatchingRegions)
+	for (const FAefPharusWallRegion* Region : MatchingRegions)
 	{
-		if (Region->WallSide == EPharusWallSide::Back)
+		if (Region->WallSide == EAefPharusWallSide::Back)
 			return Region;
 	}
 
-	for (const FPharusWallRegion* Region : MatchingRegions)
+	for (const FAefPharusWallRegion* Region : MatchingRegions)
 	{
-		if (Region->WallSide == EPharusWallSide::Left)
+		if (Region->WallSide == EAefPharusWallSide::Left)
 			return Region;
 	}
 
@@ -912,12 +912,12 @@ FVector UAefPharusInstance::TrackToLocal(const FVector2D& TrackPos, const pharus
 {
 	switch (Config.MappingMode)
 	{
-		case EPharusMappingMode::Simple:
+		case EAefPharusMappingMode::Simple:
 			return TrackToLocalFloor(TrackPos);
 
-		case EPharusMappingMode::Regions:
+		case EAefPharusMappingMode::Regions:
 		{
-			EPharusWallSide Wall;
+			EAefPharusWallSide Wall;
 			return TrackToLocalRegions(TrackPos, Wall);
 		}
 
@@ -969,19 +969,19 @@ FVector UAefPharusInstance::TrackToLocalFloor(const FVector2D& TrackPos) const
 	return LocalPos;
 }
 
-FVector UAefPharusInstance::TrackToLocalRegions(const FVector2D& TrackPos, EPharusWallSide& OutWall) const
+FVector UAefPharusInstance::TrackToLocalRegions(const FVector2D& TrackPos, EAefPharusWallSide& OutWall) const
 {
 	// NOTE: TrackPos (from RawPosition) is ALWAYS normalized (0-1 range)
 	// The normalization was already done when storing RawPosition in ConvertTrackData()
 	// So we use TrackPos directly for region lookup and transformation
 
 	// Find matching wall region
-	const FPharusWallRegion* Region = FindWallRegion(TrackPos);
+	const FAefPharusWallRegion* Region = FindWallRegion(TrackPos);
 	if (!Region)
 	{
 		UE_LOG(LogAefPharus, Error, TEXT("[%s] Track position (%.3f, %.3f) outside all wall regions!"),
 			*Config.InstanceName.ToString(), TrackPos.X, TrackPos.Y);
-		OutWall = EPharusWallSide::Floor;
+		OutWall = EAefPharusWallSide::Floor;
 		return FVector::ZeroVector;
 	}
 
@@ -1015,7 +1015,7 @@ bool UAefPharusInstance::IsTrackPositionValid(const FVector2D& InputPos) const
 	const FVector2D NormalizedPos = NormalizeTrackPosition(InputPos);
 
 	// For Floor mode (Simple): Check if normalized position is within 0-1 bounds
-	if (Config.MappingMode == EPharusMappingMode::Simple)
+	if (Config.MappingMode == EAefPharusMappingMode::Simple)
 	{
 		const bool bIsValid = NormalizedPos.X >= 0.0f && NormalizedPos.X <= 1.0f &&
 		                      NormalizedPos.Y >= 0.0f && NormalizedPos.Y <= 1.0f;
@@ -1023,7 +1023,7 @@ bool UAefPharusInstance::IsTrackPositionValid(const FVector2D& InputPos) const
 	}
 
 	// For Regions mode: Check if position falls within any defined wall region
-	if (Config.MappingMode == EPharusMappingMode::Regions)
+	if (Config.MappingMode == EAefPharusMappingMode::Regions)
 	{
 		return FindWallRegion(NormalizedPos) != nullptr;
 	}
@@ -1083,10 +1083,10 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 		}
 	}
 
-	FPharusTrackData TrackDataCopy;
+	FAefPharusTrackData TrackDataCopy;
 	{
 		FScopeLock Lock(&PendingOperationsMutex);
-		FPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
+		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
 		if (!TrackData)
 		{
 			return;
@@ -1227,7 +1227,7 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 				FVector LocalPos;
 				{
 					FScopeLock Lock(&PendingOperationsMutex);
-					FPharusTrackData* CachedData = TrackDataCache.Find(TrackID);
+					FAefPharusTrackData* CachedData = TrackDataCache.Find(TrackID);
 					if (CachedData)
 					{
 						// Recalculate LOCAL position from raw coordinates
@@ -1254,10 +1254,10 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 				if (Config.bApplyOrientationFromMovement)
 				{
 					FRotator OrientationRotation;
-					if (Config.MappingMode == EPharusMappingMode::Regions)
+					if (Config.MappingMode == EAefPharusMappingMode::Regions)
 					{
 						// Wall mode: Rotate around wall normal
-						const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+						const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 						if (Region)
 						{
 							OrientationRotation = GetWallActorRotation(TrackDataCopy.Orientation, *Region);
@@ -1277,9 +1277,9 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 				else
 				{
 					// No orientation - use wall's base rotation for walls, zero for floor
-					if (Config.MappingMode == EPharusMappingMode::Regions)
+					if (Config.MappingMode == EAefPharusMappingMode::Regions)
 					{
-						const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+						const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 						SpawnedActor->SetActorRelativeRotation(Region ? Region->WorldRotation : FRotator::ZeroRotator);
 					}
 					else
@@ -1310,10 +1310,10 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 			if (Config.bApplyOrientationFromMovement)
 			{
 				FRotator OrientationRotation;
-				if (Config.MappingMode == EPharusMappingMode::Regions)
+				if (Config.MappingMode == EAefPharusMappingMode::Regions)
 				{
 					// Wall mode: Rotate around wall normal
-					const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+					const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 					if (Region)
 					{
 						OrientationRotation = GetWallActorRotation(TrackDataCopy.Orientation, *Region);
@@ -1335,9 +1335,9 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 			else
 			{
 				// No orientation - use wall's base rotation for walls, root rotation for floor
-				if (Config.MappingMode == EPharusMappingMode::Regions)
+				if (Config.MappingMode == EAefPharusMappingMode::Regions)
 				{
-					const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+					const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 					FRotator WallBaseRotation = Region ? Region->WorldRotation : FRotator::ZeroRotator;
 					SpawnedActor->SetActorRotation(RootRotation + WallBaseRotation);
 				}
@@ -1382,10 +1382,10 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 		Actor = *ActorPtr;
 	}
 
-	FPharusTrackData TrackDataCopy;
+	FAefPharusTrackData TrackDataCopy;
 	{
 		FScopeLock Lock(&PendingOperationsMutex);
-		FPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
+		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
 		if (!TrackData)
 		{
 			return;
@@ -1414,10 +1414,10 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 		if (Config.bApplyOrientationFromMovement && !TrackDataCopy.Orientation.IsNearlyZero())
 		{
 			FRotator OrientationRotation;
-			if (Config.MappingMode == EPharusMappingMode::Regions)
+			if (Config.MappingMode == EAefPharusMappingMode::Regions)
 			{
 				// Wall mode: Rotate around wall normal
-				const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+				const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 				if (Region)
 				{
 					OrientationRotation = GetWallActorRotation(TrackDataCopy.Orientation, *Region);
@@ -1457,10 +1457,10 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 		if (Config.bApplyOrientationFromMovement && !TrackDataCopy.Orientation.IsNearlyZero())
 		{
 			FRotator OrientationRotation;
-			if (Config.MappingMode == EPharusMappingMode::Regions)
+			if (Config.MappingMode == EAefPharusMappingMode::Regions)
 			{
 				// Wall mode: Rotate around wall normal
-				const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+				const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 				if (Region)
 				{
 					OrientationRotation = GetWallActorRotation(TrackDataCopy.Orientation, *Region);
@@ -1491,9 +1491,9 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 		{
 			// No movement orientation - use wall's base rotation for walls, root rotation for floor
 			FRotator BaseRotation = RootRotation;
-			if (Config.MappingMode == EPharusMappingMode::Regions)
+			if (Config.MappingMode == EAefPharusMappingMode::Regions)
 			{
-				const FPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
+				const FAefPharusWallRegion* Region = FindWallRegion(TrackDataCopy.RawPosition);
 				if (Region)
 				{
 					BaseRotation = RootRotation + Region->WorldRotation;
@@ -1656,7 +1656,7 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 	// Process spawns
 	for (int32 TrackID : LocalSpawns)
 	{
-		FPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
+		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
 		if (TrackData)
 		{
 			pharus::TrackRecord DummyTrack;
@@ -1723,16 +1723,16 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 // Helper Functions
 //--------------------------------------------------------------------------------
 
-FPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const
+FAefPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const
 {
-	FPharusTrackData Data;
+	FAefPharusTrackData Data;
 	Data.TrackID = Track.trackID;
 	Data.WorldPosition = WorldPos;
 	Data.Speed = Track.speed * 100.0f; // m/s → cm/s
 
 	// Apply transformations to orientation for Simple mode
 	FVector2D TrackOrientation(Track.orientation.x, Track.orientation.y);
-	if (Config.MappingMode == EPharusMappingMode::Simple)
+	if (Config.MappingMode == EAefPharusMappingMode::Simple)
 	{
 		// Invert Y if needed (fixes left/right swap in orientation)
 		if (Config.bInvertY)
@@ -1775,14 +1775,14 @@ FPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackRecord&
 	Data.LastUpdateTime = FPlatformTime::Seconds();
 
 	// Determine assigned wall for Regions mode
-	if (Config.MappingMode == EPharusMappingMode::Regions)
+	if (Config.MappingMode == EAefPharusMappingMode::Regions)
 	{
-		const FPharusWallRegion* Region = FindWallRegion(Data.RawPosition);
-		Data.AssignedWall = Region ? Region->WallSide : EPharusWallSide::Floor;
+		const FAefPharusWallRegion* Region = FindWallRegion(Data.RawPosition);
+		Data.AssignedWall = Region ? Region->WallSide : EAefPharusWallSide::Floor;
 	}
 	else
 	{
-		Data.AssignedWall = EPharusWallSide::Floor;
+		Data.AssignedWall = EAefPharusWallSide::Floor;
 	}
 
 	// ConvertTrackData is only called for tracks inside valid bounds
@@ -1803,7 +1803,7 @@ FRotator UAefPharusInstance::GetRotationFromDirection(const FVector2D& Direction
 	return FRotator(0.0f, Yaw, 0.0f);
 }
 
-FRotator UAefPharusInstance::GetWallActorRotation(const FVector2D& Direction, const FPharusWallRegion& WallRegion) const
+FRotator UAefPharusInstance::GetWallActorRotation(const FVector2D& Direction, const FAefPharusWallRegion& WallRegion) const
 {
 	// Wall mode: Rotation around the wall's normal vector
 	// The 2D orientation from tracking represents movement on the wall plane:

@@ -124,7 +124,7 @@ public:
 	 * 
 	 * @return true if at least one actor is available
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Pool")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Pool")
 	bool HasFreeActors() const { return FreeIndices.Num() > 0; }
 
 	/**
@@ -132,7 +132,7 @@ public:
 	 * 
 	 * @return Number of available actors
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Pool")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Pool")
 	int32 GetFreeActorCount() const { return FreeIndices.Num(); }
 
 	/**
@@ -140,7 +140,7 @@ public:
 	 * 
 	 * @return Total number of actors in pool
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Pool")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Pool")
 	int32 GetPoolSize() const { return PooledActors.Num(); }
 
 	/**
@@ -148,7 +148,7 @@ public:
 	 * 
 	 * @return Number of actors currently in use
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Pool")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Pool")
 	int32 GetActiveActorCount() const { return PooledActors.Num() - FreeIndices.Num(); }
 
 	/**
@@ -156,7 +156,7 @@ public:
 	 * 
 	 * @return true if pool is ready to use
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus|Pool")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus|Pool")
 	bool IsInitialized() const { return bIsInitialized; }
 
 private:
@@ -218,3 +218,4 @@ private:
 	/** Is pool initialized? */
 	bool bIsInitialized;
 };
+

@@ -74,7 +74,7 @@ public:
 	 *       UE_LOG(LogTemp, Log, TEXT("Spawned for track %d"), TrackID);
 	 *   }
 	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AEF|Pharus")
 	void SetActorTrackID(int32 TrackID);
 
 	/**
@@ -106,7 +106,7 @@ public:
 	 *       UE_LOG(LogTemp, Log, TEXT("Spawned for track %d in instance %s"), TrackID, *InstanceName.ToString());
 	 *   }
 	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AEF|Pharus")
 	void SetActorTrackInfo(int32 TrackID, FName InstanceName);
 
 	/**
@@ -122,7 +122,7 @@ public:
 	 * @param TrackID The valid Pharus track ID (>= 0)
 	 * @param InstanceName Name of the tracker instance (e.g., "Floor", "Wall")
 	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AEF|Pharus")
 	void OnTrackConnected(int32 TrackID, FName InstanceName);
 
 	/**
@@ -139,6 +139,7 @@ public:
 	 * @param InstanceName Name of the tracker instance
 	 * @param Reason Why the track was lost ("Timeout", "Released", "Destroyed")
 	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AEF|Pharus")
 	void OnTrackLost(int32 TrackID, FName InstanceName, const FString& Reason);
 };
+

@@ -51,7 +51,7 @@ public:
 	 * @param InSpawnClass Actor class to spawn for tracks (optional)
 	 * @return true if initialization succeeded
 	 */
-	bool Initialize(const FPharusInstanceConfig& InConfig, UWorld* InWorld, TSubclassOf<AActor> InSpawnClass = nullptr);
+	bool Initialize(const FAefPharusInstanceConfig& InConfig, UWorld* InWorld, TSubclassOf<AActor> InSpawnClass = nullptr);
 
 	/**
 	 * Shutdown and cleanup this tracker instance
@@ -61,7 +61,7 @@ public:
 	/**
 	 * Check if this instance is currently running
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool IsRunning() const { return bIsRunning; }
 
 	//--------------------------------------------------------------------------------
@@ -84,19 +84,19 @@ public:
 	 * @param bOutIsInsideBoundary True if track is inside valid bounds (actor visible), false if outside (actor hidden)
 	 * @return true if track exists
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool GetTrackData(int32 TrackID, FVector& OutPosition, FRotator& OutRotation, bool& bOutIsInsideBoundary);
 
 	/**
 	 * Get all active track IDs
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	TArray<int32> GetActiveTrackIDs() const;
 
 	/**
 	 * Get number of currently active tracks
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	int32 GetActiveTrackCount() const;
 
 	/**
@@ -104,7 +104,7 @@ public:
 	 * @param TrackID Track ID to query
 	 * @return Spawned actor, or nullptr if not found
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	AActor* GetSpawnedActor(int32 TrackID);
 
 	/**
@@ -113,7 +113,7 @@ public:
 	 * @param TrackID Track ID to check
 	 * @return true if track is active in the system
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	bool IsTrackActive(int32 TrackID) const;
 
 	//--------------------------------------------------------------------------------
@@ -123,8 +123,8 @@ public:
 	/**
 	 * Get current configuration
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
-	const FPharusInstanceConfig& GetConfig() const { return Config; }
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
+	const FAefPharusInstanceConfig& GetConfig() const { return Config; }
 
 	/**
 	 * Update configuration at runtime (if bLiveAdjustments enabled)
@@ -132,8 +132,8 @@ public:
 	 * @param NewConfig New configuration to apply
 	 * @return true if update succeeded
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
-	bool UpdateConfig(const FPharusInstanceConfig& NewConfig);
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
+	bool UpdateConfig(const FAefPharusInstanceConfig& NewConfig);
 
 	/**
 	 * Update Floor tracker settings at runtime (Blueprint-friendly)
@@ -141,8 +141,8 @@ public:
 	 * @param NewConfig Complete configuration with updated floor settings
 	 * @return true if update succeeded
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Floor")
-	bool UpdateFloorSettings(const FPharusInstanceConfig& NewConfig);
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Floor")
+	bool UpdateFloorSettings(const FAefPharusInstanceConfig& NewConfig);
 
 	/**
 	 * Update Floor tracker settings at runtime (Simple parameters - DEPRECATED, use full config version)
@@ -155,7 +155,7 @@ public:
 	 * @param bInvertY Invert Y-axis (fixes left/right swap)
 	 * @return true if update succeeded
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Floor", meta = (DeprecatedFunction, DeprecationMessage = "Use UpdateFloorSettings(FPharusInstanceConfig) instead"))
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Floor", meta = (DeprecatedFunction, DeprecationMessage = "Use UpdateFloorSettings(FAefPharusInstanceConfig) instead"))
 	bool UpdateFloorSettingsSimple(float OriginX, float OriginY, float ScaleX, float ScaleY, float FloorZ, float FloorRotation, bool bInvertY);
 
 	/**
@@ -164,8 +164,8 @@ public:
 	 * @param NewConfig Complete configuration with updated wall settings
 	 * @return true if update succeeded
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Wall")
-	bool UpdateWallSettings(const FPharusInstanceConfig& NewConfig);
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Wall")
+	bool UpdateWallSettings(const FAefPharusInstanceConfig& NewConfig);
 
 	/**
 	 * Restart tracker with new network settings (requires LiveAdjustments enabled)
@@ -174,7 +174,7 @@ public:
 	 * @param NewUDPPort New UDP port
 	 * @return true if restart succeeded
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	bool RestartWithNewNetwork(const FString& NewBindNIC, int32 NewUDPPort);
 
 	/**
@@ -182,14 +182,14 @@ public:
 	 * New tracks will use this class for spawning. Existing tracks are not affected.
 	 * @param NewSpawnClass Actor class to spawn (must implement IAefPharusActorInterface)
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus")
 	void SetSpawnClass(UPARAM(meta = (MustImplement = "/Script/AefPharus.AefPharusActorInterface")) TSubclassOf<AActor> NewSpawnClass);
 
 	/**
 	 * Get the current SpawnClass for this tracker instance.
 	 * @return Current actor class used for spawning
 	 */
-	UFUNCTION(BlueprintPure, Category = "AefXR|Pharus")
+	UFUNCTION(BlueprintPure, Category = "AEF|Pharus")
 	TSubclassOf<AActor> GetSpawnClass() const { return SpawnClass; }
 
 	//--------------------------------------------------------------------------------
@@ -197,16 +197,16 @@ public:
 	//--------------------------------------------------------------------------------
 
 	/** Called when a new track is spawned */
-	UPROPERTY(BlueprintAssignable, Category = "AefXR|Pharus")
-	FPharusTrackSpawnedDelegate OnTrackSpawned;
+	UPROPERTY(BlueprintAssignable, Category = "AEF|Pharus")
+	FAefPharusTrackSpawnedDelegate OnTrackSpawned;
 
 	/** Called when a track is updated */
-	UPROPERTY(BlueprintAssignable, Category = "AefXR|Pharus")
-	FPharusTrackUpdatedDelegate OnTrackUpdated;
+	UPROPERTY(BlueprintAssignable, Category = "AEF|Pharus")
+	FAefPharusTrackUpdatedDelegate OnTrackUpdated;
 
 	/** Called when a track is lost */
-	UPROPERTY(BlueprintAssignable, Category = "AefXR|Pharus")
-	FPharusTrackLostDelegate OnTrackLost;
+	UPROPERTY(BlueprintAssignable, Category = "AEF|Pharus")
+	FAefPharusTrackLostDelegate OnTrackLost;
 
 	//--------------------------------------------------------------------------------
 	// Debug
@@ -218,7 +218,7 @@ public:
 	 * @param NormalizedY Y position (0-1)
 	 * @param TrackID Track ID to use (default: auto-generate)
 	 */
-	UFUNCTION(BlueprintCallable, Category = "AefXR|Pharus|Debug")
+	UFUNCTION(BlueprintCallable, Category = "AEF|Pharus|Debug")
 	void DebugInjectTrack(float NormalizedX, float NormalizedY, int32 TrackID = -1);
 
 private:
@@ -243,7 +243,7 @@ private:
 	//--------------------------------------------------------------------------------
 
 	/** Current configuration */
-	FPharusInstanceConfig Config;
+	FAefPharusInstanceConfig Config;
 
 	/** Actor class to spawn for tracks */
 	TSubclassOf<AActor> SpawnClass;
@@ -267,7 +267,7 @@ private:
 	TMap<int32, AActor*> SpawnedActors;
 
 	/** Track data cache for Blueprint access */
-	TMap<int32, FPharusTrackData> TrackDataCache;
+	TMap<int32, FAefPharusTrackData> TrackDataCache;
 
 	/** Mutex for thread-safe actor spawning */
 	mutable FCriticalSection ActorSpawnMutex;
@@ -314,12 +314,12 @@ private:
 	/**
 	 * Regions mapping: Determine wall and transform to 3D
 	 */
-	FVector TrackToWorldRegions(const FVector2D& TrackPos, EPharusWallSide& OutWall) const;
+	FVector TrackToWorldRegions(const FVector2D& TrackPos, EAefPharusWallSide& OutWall) const;
 
 	/**
 	 * Find which wall region contains the given track point
 	 */
-	const FPharusWallRegion* FindWallRegion(const FVector2D& TrackPos) const;
+	const FAefPharusWallRegion* FindWallRegion(const FVector2D& TrackPos) const;
 
 	/**
 	 * Transform 2D tracking position to LOCAL 3D position (relative to RootOriginActor)
@@ -338,7 +338,7 @@ private:
 	/**
 	 * Regions mapping: Calculate LOCAL position (no RootOrigin/RootRotation)
 	 */
-	FVector TrackToLocalRegions(const FVector2D& TrackPos, EPharusWallSide& OutWall) const;
+	FVector TrackToLocalRegions(const FVector2D& TrackPos, EAefPharusWallSide& OutWall) const;
 
 	//--------------------------------------------------------------------------------
 	// Bounds Validation
@@ -396,12 +396,12 @@ private:
 	//--------------------------------------------------------------------------------
 
 	/**
-	 * Convert Pharus TrackRecord to FPharusTrackData
+	 * Convert Pharus TrackRecord to FAefPharusTrackData
 	 * @param Track The pharus track record
 	 * @param WorldPos Calculated world position
 	 * @param InputPos Input tracking coordinates (will be normalized if needed for RawPosition)
 	 */
-	FPharusTrackData ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const;
+	FAefPharusTrackData ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const;
 
 	/**
 	 * Get FRotator from movement direction (Floor mode - Yaw rotation around World Z)
@@ -416,7 +416,7 @@ private:
 	 * @param WallRegion The wall region for this actor
 	 * @return Rotation with actors facing movement direction, aligned to wall surface
 	 */
-	FRotator GetWallActorRotation(const FVector2D& Direction, const FPharusWallRegion& WallRegion) const;
+	FRotator GetWallActorRotation(const FVector2D& Direction, const FAefPharusWallRegion& WallRegion) const;
 
 	/**
 	 * Find an existing actor by the expected Pharus track name
@@ -427,3 +427,4 @@ private:
 	 */
 	AActor* FindExistingActorByName(int32 TrackID) const;
 };
+
