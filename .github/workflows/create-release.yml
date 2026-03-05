@@ -1,0 +1,57 @@
+name: Create Release with LFS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release/Version number (e.g. 1.0.0)'
+        required: true
+        type: string
+      release_title:
+        description: 'Release title (e.g. "Initial Public Release")'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set version
+        id: version
+        run: |
+          VERSION="${{ inputs.version }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Version: $VERSION"
+
+      - name: Update .uproject version
+        run: |
+          UPROJECT="DeepSpaceStarter/Project/DeepSpaceStarter.uproject"
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Use jq to inject/update VersionName in the .uproject JSON
+          jq --arg ver "$VERSION" '.VersionName = $ver' "$UPROJECT" > tmp.uproject
+          mv tmp.uproject "$UPROJECT"
+
+          echo "✅ Updated $UPROJECT with VersionName: $VERSION"
+          cat "$UPROJECT" | head -10
+
+      - name: Create ZIP with LFS files
+        run: |
+          zip -r UE-DeepSpace-Starter-${{ steps.version.outputs.version }}.zip . \
+            -x ".git/*" ".github/*"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.version.outputs.version }}"
+          files: UE-DeepSpace-Starter-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
+          name: "${{ inputs.release_title }} (v${{ steps.version.outputs.version }})"

@@ -55,9 +55,7 @@ UE-DeepSpace-Starter/
 │   │   ├── Switchboard/               # nDisplay configuration files
 │   │   │   └── nDisplay_Deep_Space_8K.ndisplay
 │   │   └── project.json               # Deployment configuration
-│   ├── project.json                   # Development configuration
-│   └── project-test.json              # Test configuration
-├── ReadmeMedia/                       # Documentation assets
+│   └── project.json                   # Development configuration
 └── LICENSE
 ```
 

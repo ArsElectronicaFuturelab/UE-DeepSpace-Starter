@@ -1,12 +1,12 @@
 {
-    "startMap": "CinemaMap",
-    "version": "UE5.01",
+    "startMap": "Deep_Space_8K",
+    "version": "UE5.7",
     "wall": {
         "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
-        "nDisplay": "\\Switchboard\\nDisplay_DeepSpace.ndisplay"
+        "nDisplay": "\\Deploy\\Switchboard\\nDisplay_Deep_Space_8K.ndisplay"
     },
     "floor": {
         "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
-        "nDisplay": "\\Switchboard\\nDisplay_DeepSpace.ndisplay"
+        "nDisplay": "\\Deploy\\Switchboard\\nDisplay_Deep_Space_8K.ndisplay"
     }
 }

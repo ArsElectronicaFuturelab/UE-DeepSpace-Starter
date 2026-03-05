@@ -1,6 +1,7 @@
 {
 	"FileVersion": 3,
 	"EngineAssociation": "5.7",
+	"VersionName": "1.0.0",
 	"Category": "",
 	"Description": "",
 	"Plugins": [
