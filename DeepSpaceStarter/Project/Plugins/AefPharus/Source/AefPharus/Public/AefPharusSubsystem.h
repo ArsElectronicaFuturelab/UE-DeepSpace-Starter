@@ -23,7 +23,7 @@
 class AAefPharusRootOriginActor;
 
 /**
- * Mox Pharus Subsystem
+ * Aef Pharus Subsystem
  *
  * GameInstance Subsystem for managing multiple Pharus tracking instances.
  * Automatically initializes from Config/AefConfig.ini on startup.

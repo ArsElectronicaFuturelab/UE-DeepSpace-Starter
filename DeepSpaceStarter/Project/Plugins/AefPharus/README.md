@@ -375,7 +375,7 @@ For technical support, see [DOCUMENTATION.md](DOCUMENTATION.md) or contact the d
 ## Changelog
 
 ### v3.0.0 (2026-02-05) - BREAKING CHANGES
-- ⚠️ **Plugin Renamed**: `MoxPharus` → `AefPharus` (module, classes, config)
+- ⚠️ **Plugin Renamed**: `AefPharus` → `AefPharus` (module, classes, config)
 - ⚠️ **LiveLink Removed**: Complete removal of LiveLink integration
 - 📚 See [CHANGELOG.md](CHANGELOG.md) for full migration guide
 

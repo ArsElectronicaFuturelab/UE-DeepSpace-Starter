@@ -7,39 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [3.0.0] - 2026-02-05
-
-### ⚠️ BREAKING CHANGES
-
-This is a major release with breaking changes. See the migration notes below.
-
-### Changed
-- **Plugin Renamed**: `AefPharus` → `AefPharus`
-  - Module name: `AefPharus` → `AefPharus`
-  - Log category: `LogAefPharus` → `LogAefPharus`
-  - All class prefixes: `Mox` → `Aef`, `AefXR` → `AefXR`
-  - Blueprint category: `AefXR|Pharus` → `AefXR|Pharus`
-  - Config file: `AefConfig.ini` → `AefConfig.ini`
-  
-### Removed
-- **LiveLink Integration**: Completely removed from the plugin
-  - Deleted: `bEnableLiveLink`, `bEnableSlotMapping`, `MaxSlots`, `bReuseLowestSlot` config options
-  - Deleted: `AAefPharusTestActor` (was only for LiveLink testing)
-  - Removed: LiveLink dependencies from `.uplugin` and `.Build.cs`
-  - The plugin now focuses exclusively on direct actor spawning
-
-### Migration Guide v2.x → v3.0
-
-1. **Rename config file**: `AefConfig.ini` → `AefConfig.ini`
-2. **Update Blueprint references**:
-   - `Get Subsystem (UAefPharusSubsystem)` → `Get Subsystem (UAefPharusSubsystem)`
-   - `AAefPharusRootOriginActor` → `AAefPharusRootOriginActor`
-3. **Remove LiveLink configuration**: Delete any `EnableLiveLink`, `EnableSlotMapping`, `MaxSlots`, `ReuseLowestSlot` lines
-4. **Update C++ includes**: `#include "AefPharus.h"` → `#include "AefPharus.h"`
-5. **Update log filtering**: `LogAefPharus` → `LogAefPharus`
-
----
-
 
 ## [2.7.1] - 2026-02-04
 
@@ -117,7 +84,6 @@ WallRotation=90.0
 - `FPharusWallRegion::TrackToWorld()` - Now accepts `GlobalWallRotation` parameter
 - `FPharusWallRegion::TrackToLocal()` - Now accepts `GlobalWallRotation` parameter
 - `UAefPharusSubsystem::LoadConfigurationFromIni()` - Loads `WallRotation` from INI
-- `FAefPharusLiveLinkEditorSource::LoadConfigFromIni()` - Loads `WallRotation` for LiveLink
 
 ### Migration Notes
 - If you have existing wall configurations, add `WallRotation` matching your `FloorRotation`
@@ -280,7 +246,6 @@ WallRotation=90.0
 - `AefPharusInstance::SpawnActorForTrack()` - Full 3D rotation for actor orientation
 - `AefPharusInstance::UpdateActorForTrack()` - Full 3D rotation for actor updates
 - `FPharusWallRegion::TrackToWorld()` - Full 3D rotation for wall positions
-- `FAefPharusLiveLinkEditorSource::TrackToWorldFloor()` - Full 3D rotation for LiveLink
 
 ---
 
@@ -293,7 +258,6 @@ WallRotation=90.0
   - Added "Movement & Transform" category for behavior settings
   - Improved two-column layout for preset selection (Current Preset vs. Change Preset To)
   - Streamlined "Tracking Instances" section with side-by-side Floor/Wall configuration
-  - Added "LiveLink Integration" category to Advanced & Debug section
 
 ### Changed
 - **Preset Management UI**: Renamed controls for clarity
@@ -302,11 +266,10 @@ WallRotation=90.0
   - "Select Template..." → "Select Preset..."
   - "Apply Template" → "Apply"
 - **Config File Naming**: Standardized directory and file naming
-  - Directory: `Project/Config/AefPresets/` → `Plugins/MoxEditor/Config/Presets/`
-  - File prefix: `AefConfig-*.ini` → `AefPreset_*.ini`
-  - Main config: `AefConfig.ini` → `AefConfig.ini`
+  - Presets directory: `Plugins/AefPharus/Config/Presets/`
+  - File prefix: `AefPreset_*.ini`
+  - Main config: `AefConfig.ini`
 - **Advanced & Debug**: Reorganized into clear sub-categories
-  - LiveLink Integration (Floor + Wall)
   - Actor Pool Configuration (consolidated pool settings)
   - Movement & Transform (UseLocalSpace, ApplyOrientationFromMovement, LiveAdjustments)
   - Debug & Logging
@@ -423,19 +386,11 @@ WallRotation=90.0
 - **AutoStartSystem Config**: Option for manual control (`true` = auto-start, `false` = manual)
 - **GameInstance Subsystem Architecture**: Persistent tracking across level transitions
 - **Multi-Instance Support**: Run Floor + Wall trackers simultaneously
-- **LiveLink Integration**: Connect tracks to Animation Blueprints & Sequencer
-  - Slot mapping for fixed subject names
-  - `EnableLiveLink` flag controls actor spawning
 - **nDisplay Actor Pool**: Deterministic spawning for cluster synchronization
 - **Flexible Mapping Modes**: Simple, Regions
 - **Global Root Origin System**: Single 3D origin for all tracking instances
 - **Live Configuration Adjustments**: Update settings at runtime
 - **Debug Logging System**: Configurable verbosity levels
-
-### Fixed
-- **EnableLiveLink Flag**: Now correctly controls actor spawning
-  - `true` = Actors + LiveLink subjects
-  - `false` = LiveLink-only mode (no actors spawn)
 
 ---
 

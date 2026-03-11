@@ -42,7 +42,7 @@ Select the configuration template that matches your setup:
 | **Floor tracking only** | `AefPreset_FloorOnly.ini` | [Floor Setup](#floor-setup) |
 | **Complete 3D room** | `AefPreset_Complete3DRoom.ini` | [3D Room Setup](#3d-room-setup) |
 
-All templates are in: `Plugins/MoxEditor/Config/Presets/`
+All templates are in: `Plugins/AefPharus/Config/Examples/`
 
 ---
 
