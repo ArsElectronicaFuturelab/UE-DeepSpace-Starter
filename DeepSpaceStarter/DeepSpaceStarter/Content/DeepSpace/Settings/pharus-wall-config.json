@@ -1,8 +1,0 @@
-{
-    "fileName": "pharus-wall-config.json",
-    "isEnabled": true,
-    "pharusTrackerBindNIC": "192.168.19.114",
-    "pharusPort": 44345,
-    "sizeX": 80,
-    "sizeY": 100.0
-}

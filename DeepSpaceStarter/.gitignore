@@ -1,1 +1,40 @@
-Build/*
+# Unreal Engine generated directories
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Deploy/Build: keep the folder (.gitkeep), ignore the packaged application
+!Deploy/Build/
+Deploy/Build/*
+!Deploy/Build/.gitkeep
+
+# Project-level Binaries (regenerated on build)
+Project/Binaries/
+
+# Plugin Binaries - ALLOW DLLs and .modules for Blueprint distribution!
+# Only ignore build artifacts (.target files) and debug symbols (.pdb)
+Project/Plugins/**/Binaries/**/*.target
+Project/Plugins/**/Binaries/**/*.pdb
+# Explicitly include DLLs and .modules (essential for Blueprint projects)
+!Project/Plugins/**/Binaries/**/*.dll
+!Project/Plugins/**/Binaries/**/*.modules
+
+# Pharus simulators: debug symbols / incremental link files (not needed to run)
+Pharus/**/*.pdb
+Pharus/**/*.ilk
+
+# Plugins (external, not version-controlled)
+Project/Plugins/AefDeepSync/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.sln
+*.suo
+*.user
+
+# Other
+*.log
+*.VC.db
+*.VC.opendb
