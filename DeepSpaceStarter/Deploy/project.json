@@ -1,0 +1,8 @@
+{
+    "startMap": "Deep_Space_8K",
+    "version": "UE5.7",
+    "type": "unreal",
+    "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
+    "nDisplay": "\\Switchboard\\ND_Deep_Space_8K.ndisplay",
+    "args": ""
+}

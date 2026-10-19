@@ -1,197 +1,364 @@
-# Unreal Engine - DeepSpace Starterkit
-## Table of Contents
-- [Unreal Engine - DeepSpace Starterkit](#unreal-engine---deepspace-starterkit)
-  - [Table of Contents](#table-of-contents)
-  - [Quick links](#quick-links)
-  - [Overview](#overview)
-    - [Default DeepSpace Views](#default-deepspace-views)
-      - [Character Connected to the nDisplay Actor](#character-connected-to-the-ndisplay-actor)
-      - [Camera Connected to the nDisplay Actor](#camera-connected-to-the-ndisplay-actor)
-      - [Cinematic Actor Camera Connected to the nDisplay Actor](#cinematic-actor-camera-connected-to-the-ndisplay-actor)
-    - [Development with UE pharus and pharus Simulator](#development-with-ue-pharus-and-pharus-simulator)
-  - [Folder Structure](#folder-structure)
-  - [Configuration](#configuration)
-  - [Quickstart Project with Switchboard](#quickstart-project-with-switchboard)
-  - [Switchboard Settings](#switchboard-settings)
-  - [Development](#development)
-  - [Production](#production)
-    - [Package project](#package-project)
-    - [Update project.json and project-test.json](#update-projectjson-and-project-testjson)
-    - [Zip project](#zip-project)
-  - [Notes](#notes)
-    - [Important Notes](#important-notes)
-    - [Notes on Unreal Engine Project Settings 4 \& 5](#notes-on-unreal-engine-project-settings-4--5)
+# Unreal Engine 5 - DeepSpace-Starter
 
-## Quick links 
-Download UE DeepSpace Starter (Zips). [Deprecated] version should still work but will are not maintained anymore.
-* [[Deprecated] UE 4.27 DeepSpace Starter](https://codeload.github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/zip/refs/heads/UE-4.27-DeepSpace-Starter)
-* [[Deprecated] UE 5.0 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
-* [[Deprecated] UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip)
-<!--- PHARUS is included in the UE-5.3 starter kit
-Download UE Pharus DeepSpace Plugin
-* [UE 4.27 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-4.27-Pharus-Lasertracking-Plugin.zip)
-* [UE 5.0 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-5.0-Pharus-Lasertracking-Plugin.zip)
-* [UE 5.1 Pharus Lasertracking](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-PharusLasertracking/archive/refs/heads/UE-5.1-Pharus-Lasertracking-Plugin.zip)
---->
+[![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.7-blue)](https://unrealengine.com)
+[![Release](https://img.shields.io/github/v/release/ArsElectronicaFuturelab/UE-DeepSpace-Starter)](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+Unreal Engine 5.7 project template for interactive installations with Pharus laser tracking and nDisplay cluster rendering.
 
 ## Overview
-The UE-DeepSpace Starterkit is an Unreal Engine template designed specifically for the [Ars Electronica](https://ars.electronica.art/news/en/) museum's [DeepSpace](https://ars.electronica.art/center/en/exhibitions/deepspace), which features two large projection screens. The template supports [Unreal Engine](https://www.unrealengine.com/) versions 4.27.3 to 5.3.2 and includes [nDisplay](https://docs.unrealengine.com/4.26/en-US/WorkingWithMedia/nDisplay/Overview/) configuration files for both DeepSpace and standard PC/laptop (Devlopment & Testing) setups.
 
-The project templates share the same structure, with main folders located in "Content/DeepSpace":
+UE-DeepSpace-Starter is a Blueprint-based project template developed by Ars Electronica Futurelab for the [Deep Space 8K](https://ars.electronica.art/center/en/exhibitions/deepspace) installation at the Ars Electronica Center. It integrates Pharus laser tracking hardware with Unreal's nDisplay system for multi-projector setups on floor and wall surfaces.
 
-* Cinematics: Example cinematics for the CinematicMap
-* Core: Blueprints for characters, GameModeBases, and ConnectorActorHelpers
-* Maps: Four maps for various scenarios
-* Settings: Configuration files for DeepSpace devices
-* Switchboard: nDisplay configuration files in "*.uasset" format and a mesh for floor and wall projection
+**This is a Blueprint project** with included C++ plugins. All core functionality is accessible via Blueprints; the editor runs without compiling anything. The AefPharus (Pharus laser tracking) and AefUtility (configuration file handling) plugins are included with pre-compiled editor binaries.
+
+## Requirements
+
+- **Unreal Engine**: 5.7
+- **Platform**: Windows 64-bit
+- **Git LFS**: required when cloning (assets and binaries are stored with [Git LFS](https://git-lfs.com))
+- **Visual Studio 2022** with the "Game development with C++" workload: required for packaging only, because Unreal compiles the included C++ plugins when it packages the project
+
+## Quick Links
+
+Download UE DeepSpace Starter (Zips). [Deprecated] versions should still work but are not maintained anymore.
+
+| Version | Status | Download |
+|---------|--------|----------|
+| UE 5.7 | **Current** | [Latest release](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest) (ZIP incl. all LFS files) |
+| UE 5.3 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.3-DeepSpace-Starter-Experimental.zip) |
+| UE 5.1 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip) |
+| UE 5.0 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip) |
+| UE 4.27 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27-DeepSpace-Starter.zip) |
+
+> **Note:** For UE 5.7 use the ZIP from the release. GitHub's "Code → Download ZIP" may contain only Git LFS pointer files instead of the actual assets.
+
+## Versioning & Releases
+
+The project, the included plugins (AefPharus, AefUtility) and `AefConfig.ini` share **one version number** ([Semantic Versioning](https://semver.org)); the current version is shown in the release badge above.
+
+The single source of truth is `ProjectVersion` in `DeepSpaceStarter/Project/Config/DefaultGame.ini`. These values must always match it:
+
+| File | Key |
+|------|-----|
+| `DeepSpaceStarter/Project/Config/DefaultGame.ini` | `ProjectVersion` (source) |
+| `DeepSpaceStarter/Project/DeepSpaceStarter.uproject` | `VersionName` |
+| `DeepSpaceStarter/Project/Plugins/*/*.uplugin` | `VersionName` (also increase the integer `Version`) |
+| `DeepSpaceStarter/Project/Config/AefConfig.ini` | `[General] Version` |
+
+**Creating a release:** update all versions above (plus the plugin `CHANGELOG.md` / `README.md` files) and push. The workflow [`.github/workflows/create-release.yml`](.github/workflows/create-release.yml) runs automatically when `DefaultGame.ini` changes on `main` or `UE-5.7-DeepSpace-Starter`:
+
+1. Reads `ProjectVersion` and checks that all versions above match; the run fails if one differs.
+2. Skips the release if the tag `v<version>` already exists.
+3. Creates the tag `v<version>` and a GitHub release with a ZIP that contains all Git LFS files.
+
+The workflow can also be started manually (Actions → Create Release with LFS → Run workflow); in that case it fails if the tag already exists.
+
+## Project Structure
+
+```
+UE-DeepSpace-Starter/
+├── .github/workflows/                 # Release workflow (tag + release ZIP)
+├── DeepSpaceStarter/
+│   ├── Project/
+│   │   ├── DeepSpaceStarter.uproject  # Unreal Engine project file
+│   │   ├── Content/                   # Game assets and blueprints
+│   │   │   └── DeepSpace/             # Deep Space specific content
+│   │   │       ├── Examples/          # Example actors (e.g. synced person reference)
+│   │   │       ├── Library/           # Blueprint libraries
+│   │   │       ├── Maps/              # Level maps
+│   │   │       ├── Materials/         # Materials and shaders
+│   │   │       ├── Models/            # 3D models
+│   │   │       └── Switchboard/       # nDisplay configuration assets
+│   │   ├── Config/                    # Project configuration
+│   │   │   ├── AefConfig.ini          # Pharus tracking configuration
+│   │   │   ├── Default*.ini           # Engine/Input/Game settings (DefaultGame.ini holds the version)
+│   │   │   └── Windows/               # Windows-specific engine settings
+│   │   └── Plugins/                   # C++ plugins (pre-compiled)
+│   │       ├── AefPharus/             # Pharus laser tracking plugin
+│   │       ├── AefUtility/            # Loads AefConfig.ini, stages it into packaged builds
+│   │       └── AefDeepSync/           # Optional, not included (see below)
+│   ├── Pharus/                        # Pharus simulator tools
+│   │   └── DeepSpace/                 # Preconfigured simulators
+│   │       ├── TrackLinkSimulator_*/  # TrackLink simulators (multicast/unicast)
+│   │       └── pharus-rec-sim-*/      # Pharus recording simulators
+│   ├── Deploy/                        # Deep Space deployment folder
+│   │   ├── Build/                     # Packaged application (generated)
+│   │   ├── Switchboard/               # nDisplay configuration files
+│   │   │   └── ND_Deep_Space_8K.ndisplay
+│   │   └── project.json               # Deployment configuration
+└── LICENSE
+```
+
+## Plugins
+
+### AefPharus
+
+C++ plugin for Pharus laser tracking integration (included with pre-compiled binaries).
+
+**Features:**
+- Floor tracking with configurable mapping (scale, rotation, global root origin)
+- nDisplay cluster synchronization
+- Thread-safe operation
+- Blueprint API for runtime control
+
+**Documentation:** See [AefPharus README](DeepSpaceStarter/Project/Plugins/AefPharus/README.md) for detailed configuration.
+
+### AefUtility
+
+Shared C++ plugin used by AefPharus (included with pre-compiled binaries).
+
+**Features:**
+- Resolves the active configuration file: `Project/Config/AefConfig.ini`, or the file given with `-aefConfig=<path>`
+- Copies `AefConfig.ini` automatically into packaged builds as a loose, editable file
+
+**Documentation:** See [AefUtility README](DeepSpaceStarter/Project/Plugins/AefUtility/README.md).
+
+### AefDeepSync (optional)
+
+Plugin for DeepSync wearables (heart rate, LED color, IDs) and their link to Pharus tracks. It is **not part of this repository** and is only needed for projects that use the DeepSync wearables. It is maintained in its own repository with its own version number: [UE-DeepSpace-DeepSync](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync).
+
+**Installation:**
+1. Get the plugin from the [UE-DeepSpace-DeepSync](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync) repository.
+2. Copy its `Plugins/AefDeepSync/` folder to `DeepSpaceStarter/Project/Plugins/AefDeepSync/`. This folder is listed in `.gitignore` and is not committed to this repository.
+3. Restart the editor. The plugin requires AefPharus, which is already included.
+4. Configure it in the `[DeepSync]` section of `Project/Config/AefConfig.ini`. The section is already prepared and is ignored while the plugin is not installed.
+
+**Documentation:** See the [AefDeepSync README](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync#readme).
+
+## Engine Plugins
+
+The project uses the following Unreal Engine plugins:
+
+- **nDisplay** - Multi-projector cluster rendering
+- **Switchboard** - Cluster management and deployment
+
+## Getting Started
 
 ### Prerequisites
-* Install *VaRest* from the Epic Games Marketplace. *VaRest* is used by pharus tracking.
 
-### Default DeepSpace Views
-#### Character Connected to the nDisplay Actor
-* The character/pawn view is controlled using a gamepad for movement and view
-![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CharacterMap.png)
+1. **Install Unreal Engine 5.7**
+   - Download from Epic Games Launcher
+   - Associate .uproject files with UE 5.7
 
-#### Camera Connected to the nDisplay Actor
-* A standard camera is connected, allowing movement and rotation control via its transformation
-  ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CinemaMap.png)
+2. **Clone or download the repository**
+   ```bash
+   git lfs install
+   git clone --branch UE-5.7-DeepSpace-Starter https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter.git
+   cd UE-DeepSpace-Starter
+   ```
 
-#### Cinematic Actor Camera Connected to the nDisplay Actor
-DeepSpace View as a [In-Camera VFX](https://docs.unrealengine.com/5.1/en-US/in-camera-vfx-overview-in-unreal-engine)
-* Requires more performance when used for the entire screen
-* Utilize camera settings like FOV, aperture, etc.
-![Switchboard View Camera Map](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-CameraMap.png)
+   Or download the ZIP of the [latest release](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest).
 
+### Opening the Project
 
-### Development with UE pharus and pharus Simulator
-2 Views (normal wall + floor view)
-![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-1.png)
+1. Navigate to `DeepSpaceStarter/Project/`
+2. Double-click `DeepSpaceStarter.uproject`
+3. Unreal Editor will open the project
 
-2 Views (wall = front view, floor = top down view)
-![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-2.png)
+### Running with Switchboard
 
-2 Views (wall = front view, floor = top down view)
-![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Switchboard-View-Pharus-StartMap-3.png)
+1. **Install Switchboard Dependencies**
+   - In Unreal Editor: Edit → Editor Preferences → Plugins → Switchboard
+   - Click "Install Prerequisites" if prompted
+   - Create desktop shortcuts for "Switchboard" and "Switchboard Listener"
 
-## Folder Structure
-    \Build                      -> packaged application (empty if not packaged)
-    \DeepSpaceStarter           -> Starter Kit
-    \Switchboard                -> must be untouched
-    \project.json               -> set your startmap and the path to the application exe of your packaged game (relative).  
+2. **Start the Application**
+   - Keep Unreal Editor running with the project open
+   - Launch Switchboard from the desktop shortcut
+   - Create a new config (Configs → New Config)
+   - Run Switchboard Listener from desktop or Tools → Listener
+
+3. **Configure nDisplay**
+   - Add Device → nDisplay Cluster
+   - Click "Populate"
+   - Choose `ND_Deep_Space_8K.uasset`
+   - Click the Plugin-Icon in the table header to connect to listener
+   - Click "Start all connected Display devices"
 
 ## Configuration
-To start a new project, either use one of the included templates based on a [UE nDisplay template](https://docs.unrealengine.com/5.1/en-US/) or migrate the Switchboard folder into an existing project. Follow the Unreal Engine guide on [Add nDisplay to an Existing Project](https://docs.unrealengine.com/4.26/en-US/WorkingWithMedia/nDisplay/AddToExisting/).
 
-When adding nDisplay to an existing project, create an empty root actor at position (0, 0, 0) in a level. Add the nDisplay files as child objects from the "/Content/DeepSpace/Switchboard" folder and reset the transform node to position (0, 0, 0). Ensure the nDisplay Actors have the "Actor Hidden In Game" property checked (Details Panel). Adjust the "Preview Screen Percentage" in the Editor Preview tab to suit your needs and performance, with the default value set to 0.25.
+### Pharus Tracking Configuration
 
-* The nDisplay configuration files in the editor display settings for either desktop or DeepSpace, differing by IP address(es), projection surfaces, and viewport size. ![nDisplay DeepSpace configuration](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_DeepSpace.png)
-* Make changes to the panel cluster for the desktop files for testing purposes if required. Do not modify the DeepSpace nDisplay configurations, as this may cause the project to malfunction in DeepSpace.
-* Configuration files are loaded as ".uasset" in Unreal Engine. If you want to customize by extending a configuration file, ensure you export the configuration file to "/DeepSpaceStarter/Switchboard/". ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/nDisplay_export.png)
-* For further information on configuration possibilities, refer to the [nDisplay 3D Config Editor](https://docs.unrealengine.com/5.1/en-US/ndisplay-3d-config-editor-in-unreal-engine) documentation.
+Configuration file: `Project/Config/AefConfig.ini`
 
-## Quickstart Project with Switchboard
-* Download [UE 5.1 DeepSpace Starter](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip)
-* Open "/DeepSpaceStarter/DeepSpaceStarter.uproject"
-* Rebuild all Maps in "DeepSpaceStarter/Content/DeepSpace/Maps"
-* Editor Preferences
-  * Reinstall Dependencies if necessary and create shortcuts on the desktop for "Switchboard" and "Switchboard Listener"
-  * Switchboard/Virtual Environment Path is the location of Switchboard
-  * Follow those steps if you run into any problems [Prerequisites](https://docs.unrealengine.com/5.0/en-US/switchboard-quick-start-for-unreal-engine)
-* Run UE Project (DeepSpaceStarter) in background
-* Start Switchboard (Desktop Shortcut or "\Engine\Plugins\VirtualProduction\Switchboard\Source\Switchboard\Switchboard.bat")
-* Switchboard
-  * Configs/New config and click ok (should be auto filled out)
-  * Run Switchboard listener from the desktop or "Tools/Listener"
-  * Choose the "CinemaMap" in the "Level" select option
-  * Add Device/nDisplay Cluster
-    * Click "Populate"
-    * Choose "nDisplay_Desktop.uasset"
-  * Click the Plugin-Icon in the table header (connects to listener)
-  * nDisplay Monitor gets updated with the current nDisplay configuration
-  * Click "Start all connected Display devices"
+- Loaded at startup by the AefUtility plugin; restart after changes.
+- Use a different file with the command-line argument `-aefConfig=<path>` (relative paths start at the project directory, e.g. in `project.json` → `args`).
+- Packaged builds contain the file automatically at `Build/Windows/DeepSpaceStarter/Config/AefConfig.ini`, where it can be edited on site.
 
-## Switchboard Settings
-Additional information can be found at [Switchboard Settings Reference](https://docs.unrealengine.com/5.0/en-US/switchboard-settings-reference-for-unreal-engine/)
-* Switchboard
-  * IP Address: 127.0.0.1
-* Multi User Server
-  * Auto Launch: [ ]
-  * Clean History: [ ]
-  * Auto Build: [ ]
-  * Auto Endpoint: [ ]
-  * Unreal Multi-user Server Auto-join: []
-* nDisplay Settings
-  * Texture Streaming: [ ]
-  * Render API: dx 11
-  * Render Mode: Mono
-  * Render Sync policy: Config
-  * Minimize Before Launch: [ ]
-  * Unicast Endpoint: 127.0.0.1:0
-  * node_wall
-    * IP address: 127.0.0.1
-    * Unicast Endpoint: 127.0.0.1:0
+See the [AefPharus Plugin Documentation](DeepSpaceStarter/Project/Plugins/AefPharus/README.md) for detailed configuration options.
 
+### Pharus Simulator
+
+Preconfigured simulators are available in `DeepSpaceStarter/Pharus/DeepSpace/`:
+
+- `TrackLinkSimulator_MultiCast_Floor/` - TrackLink multicast simulator
+- `TrackLinkSimulator_UniCast_Floor/` - TrackLink unicast simulator
+- `pharus-rec-sim-v2.4.0-s0-release_MultiCast_Floor/` - Pharus recording simulator (multicast)
+- `pharus-rec-sim-v2.4.0-s0-release_UniCast_Floor/` - Pharus recording simulator (unicast)
+
+### nDisplay Configuration
+
+Configuration files in `Content/DeepSpace/Switchboard/`:
+
+- `ND_Deep_Space_8K.uasset` - Deep Space 8K configuration (wall + floor)
+- Exported config: `Deploy/Switchboard/ND_Deep_Space_8K.ndisplay` (re-export after every change to the asset)
+
+> **Important:** Do not modify the Deep Space nDisplay configurations. Changes may cause the project to malfunction in the Deep Space environment.
 
 ## Development
-If there is no nDisplay experience it is recommended to have a look at the following tutorials:
-* Overview [Unreal Engine 4.27 In-Camera VFX Tutorials | 1: Introduction](https://www.youtube.com/watch?v=ebf1rRkYFmU&list=PLZlv_N0_O1gaXvxPtn8_THYN_Awx-VYeu)
-* Switchboard [Unreal Engine 4.27 In-Camera VFX Tutorials | 2: Switchboard](https://www.youtube.com/watch?v=lJcsB21vhJA&t=11s) 
-* NDisplay Config [Unreal Engine 4.27 In-Camera VFX Tutorials | 3: nDisplay Config](https://www.youtube.com/watch?v=5k4tB2mo_vc&list=PLZlv_N0_O1gaXvxPtn8_THYN_Awx-VYeu&index=3)
+
+### Content Structure
+
+Main content is located in `Content/DeepSpace/`:
+
+- **Maps/** - Level maps for various scenarios
+- **Library/** - Reusable Blueprint libraries
+- **Materials/** - Materials and shaders
+- **Models/** - 3D meshes including projection surfaces
+- **Switchboard/** - nDisplay configuration assets
+
+### Switchboard Settings
+
+Recommended settings for local development:
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| IP Address | 127.0.0.1 | |
+| Render API | DirectX 11 | |
+| Render Mode | Mono | Use `Stereo` for 3D output |
+| Render Sync Policy | Config | |
+| Texture Streaming | Disabled | |
+
+### Learning Resources
+
+If you're new to nDisplay, check out these tutorials:
+- [Simple nDisplay Setup in Unreal 5.6](https://www.youtube.com/watch?v=ocSTG1yqTmA)
+- [Unreal Engine 5.4 | Improving nDisplay Rendering](https://www.youtube.com/watch?v=tOTzvH0p_cw)
+- [Unreal Engine 4.27 In-Camera VFX: Introduction](https://www.youtube.com/watch?v=ebf1rRkYFmU&list=PLZlv_N0_O1gaXvxPtn8_THYN_Awx-VYeu)
+- [Unreal Engine 4.27 In-Camera VFX: Switchboard](https://www.youtube.com/watch?v=lJcsB21vhJA)
+- [Unreal Engine 4.27 In-Camera VFX: nDisplay Config](https://www.youtube.com/watch?v=5k4tB2mo_vc)
 
 ## Production
-For productive use in DeepSpace, an *.ndisplay configuration file is required ("DeepSpaceStarter/Switchboard/*.ndisplay). Export this file from the Unreal Engine Editor's nDisplayCluster Blueprint when changes are made to the Blueprints.
 
-### Package project
-Once the project configuration and setup are complete, it can be uploaded by technicians from the Ars Electronica museum staff or authorized individuals. Follow these recommended steps:
-* Open the Project Launcher ![nDisplay configuration export](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/main/Files/Build-Step-Project-Launcher.png)
-* Create custom profile
-* Choose a appropriate  name for the new profile (each project has a profile)
-* The project should be automatically set
-* Build options can be set to "development" or "shipping"
-* Cooking should be set to "By the book"
-  * Cooked Platforms: Windows
-  * Cooked Cultures: en (or project related cultures)
-  * Cooked Maps: choose all used maps in the final project
-* Package and store locally
-  * Choose Folder "DeepSpaceStarter/Build"
-* No archive, deployment, or launch is required
-* find additional information on [Build Operations: Cook, Package, Deploy and Run](https://docs.unrealengine.com/4.27/en-US/SharingAndReleasing/Deployment/BuildOperations/)
+### Packaging the Project
 
-### Update project.json and project-test.json
-Update the project.json in the root folder based on the nDisplay_Configuration file used in the project:
-* change the "startMap" content, which should be loaded at application start
-* Keep the version unchanged if you used the DeepSpace-Starter template
-  * Available Options:
-    * UE4.27
-    * UE5.00
-    * UE5.01
-    * UE5.03
-* Choose the the nDisplay configuration file from the folder "/DeepSpaceStarter/Switchboard" and replace  the content in" wall/nDisplay" and "floor/nDisplay"
+1. Open Project Launcher (File → Project Launcher)
+2. Create a custom profile with an appropriate name
+3. Configure build options:
+   - Build: Development or Shipping
+   - Cooking: "By the book"
+   - Cooked Platforms: Windows
+   - Cooked Maps: Select all used maps
+4. Package to `DeepSpaceStarter/Deploy/Build/`
 
-### Zip project
-The Zip Root folder is located in "/DeepSpaceStarter/". In the DeepSpace environment, only the following files and folders are required:
-  * /Build
-  * /Switchboard
-  * /project.json
+Packaging compiles the included C++ plugins, so Visual Studio 2022 with the C++ workload has to be installed. The packaging log shows `... is being treated as a code-based project ... Creating temporary .Target.cs files.`; this is expected (see [AefUtility README → Packaging](DeepSpaceStarter/Project/Plugins/AefUtility/README.md#packaging)).
 
-## Notes 
-### Important Notes
-  * Use a fixed framerate of 30 or 60 FPS to avoid syncing issues
-  * Include the nDisplayCluster Actor in the map intended for DeepSpace playback
-  * when "nDisplay_DeepSpace", "nDisplay_Camera_DeepSpace", "nDisplay_Remote_DeepSpace", "nDisplay_DeepSpace_2_Views" are changed -> 
-    * Export the *.ndisplay file type from the nDisplay actor blueprint (double-click the nDisplay actor, toolbar, export, save as *.ndisplay)
-    * Set export destination to "\DeepSpaceStarter\Switchboard"
-    * Failure to follow these steps may result in unexpected application behavior
-  * The folder structure must be followed
-  * Currently Unreal Engine with nDisplay configuration and stereoscopic output requires DX11
+For more details, see [Build Operations Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/build-operations-cooking-packaging-deploying-and-running-projects-in-unreal-engine?application_version=5.7).
 
-### Notes on Unreal Engine Project Settings 4 & 5
-* Unreal Engine 5's nDisplay Template is not optimized for large screen projections. Disable unnecessary settings for better performance.
-* Recommended project settings for optimal FPS:
-  * Disable Ambient Occlusion (especially important for UE5)
-  * Set Anti-Aliasing Method to FXAA (especially important for UE5)
-  * Set Dynamic Global Illumination Method to None
-  * Set Reflection Method to None
-  * Set Shadow Map Method to Shadow Maps
-    
+### Deployment Folder Structure
+
+The `Deploy/` folder contains everything needed for Deep Space deployment:
+
+```
+DeepSpaceStarter/Deploy/
+├── Build/                              # Packaged application
+│   └── Windows/
+│       ├── DeepSpaceStarter.exe
+│       └── DeepSpaceStarter/Config/AefConfig.ini   # Tracking configuration (copied automatically)
+├── Switchboard/                        # nDisplay configuration
+│   └── ND_Deep_Space_8K.ndisplay
+└── project.json                        # Deployment configuration
+```
+
+### project.json Configuration
+
+Update `DeepSpaceStarter/Deploy/project.json` for production deployment:
+
+```json
+{
+    "startMap": "Deep_Space_8K",
+    "version": "UE5.7",
+    "type": "unreal",
+    "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
+    "nDisplay": "\\Switchboard\\ND_Deep_Space_8K.ndisplay",
+    "args": ""
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `startMap` | Name of the level to load at startup |
+| `version` | Unreal Engine version (UE5.7) |
+| `type` | Project type (`unreal`) |
+| `executable` | Path to packaged executable (relative to Deploy/) |
+| `nDisplay` | Path to nDisplay configuration (wall + floor, relative to Deploy/) |
+| `args` | Additional command line arguments (optional) |
+
+### Handover / Deployment Package
+
+For Deep Space deployment, zip the entire `Deploy/` folder with a descriptive filename:
+
+**Naming Convention:**
+```
+[ProjectName]_[Date]_[2D|3D]_[Version].zip
+```
+
+**Examples:**
+- `DeepSpaceStarter_2026-02-05_2D_v1.0.zip`
+- `MyProject_2026-03-15_3D_v2.1.zip`
+- `ArsExhibition_2026-04-20_3D_final.zip`
+
+**Package Contents:**
+```
+Deploy/
+├── Build/          # Packaged application (Windows/)
+├── Switchboard/    # nDisplay configuration (.ndisplay)
+└── project.json    # Deployment configuration
+```
+
+**Checklist before handover:**
+- [ ] `project.json` updated with correct `startMap` and `version`
+- [ ] nDisplay configuration exported to `Switchboard/`
+- [ ] Application packaged to `Build/Windows/`
+- [ ] `Build/Windows/DeepSpaceStarter/Config/AefConfig.ini` exists and contains the production values
+- [ ] ZIP filename includes 2D or 3D mode
+- [ ] ZIP filename includes unique version/date
+
+## Important Notes
+
+- **NO Fixed Framerate:** disable fixed framerate to avoid cluster desyncs
+- **nDisplay Actor:** Always include in maps intended for Deep Space playback
+- **DirectX 11:** Support for DirectX 11 rendering in UE 5.7 (DirectX 12 may cause applications to not launch in DeepSpace)
+- **Stereoscopic 3D:** Set Render Mode to `Stereo` for active 3D output
+- **Configuration Export:** When modifying DeepSpace nDisplay actors, export the `.ndisplay` file to `/Switchboard/`
+
+### Performance Recommendations
+
+For optimal performance in Deep Space:
+
+| Setting | Recommended Value |
+|---------|-------------------|
+| Ambient Occlusion | Disabled |
+| Anti-Aliasing | FXAA |
+| Dynamic Global Illumination | None |
+| Reflection Method | None |
+| Shadow Map Method | Shadow Maps |
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details. The license applies to the whole repository, including the AefPharus and AefUtility plugins.
+
+## Credits
+
+**Developed by:** Ars Electronica Futurelab
+
+**Website:** https://ars.electronica.art/futurelab/
+
+## Support
+
+For technical support or questions:
+
+- [Ars Electronica Futurelab](https://ars.electronica.art/futurelab/)
+- [Unreal Engine nDisplay Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/ndisplay-overview-for-unreal-engine?application_version=5.7)
+- [Switchboard Quick Start Guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/switchboard-quick-start-for-unreal-engine?application_version=5.7)

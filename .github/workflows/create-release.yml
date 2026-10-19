@@ -1,0 +1,117 @@
+name: Create Release with LFS
+
+# Version source of truth: ProjectVersion in DeepSpaceStarter/Project/Config/DefaultGame.ini
+# The .uproject VersionName, every project plugin's VersionName and [General] Version in AefConfig.ini must match it.
+# - push: runs when DefaultGame.ini changes; creates tag v<ProjectVersion> + release if the tag does not exist yet
+# - workflow_dispatch: manual run on the selected branch; fails if the tag already exists
+
+on:
+  push:
+    branches:
+      - main
+      - UE-5.7-DeepSpace-Starter
+    paths:
+      - DeepSpaceStarter/Project/Config/DefaultGame.ini
+  workflow_dispatch:
+    inputs:
+      release_title:
+        description: 'Release title (empty = "UE <EngineVersion> Deep Space - StarterKit")'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DEFAULT_GAME_INI: DeepSpaceStarter/Project/Config/DefaultGame.ini
+  UPROJECT: DeepSpaceStarter/Project/DeepSpaceStarter.uproject
+  AEF_CONFIG_INI: DeepSpaceStarter/Project/Config/AefConfig.ini
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Read version from DefaultGame.ini
+        id: version
+        run: |
+          VERSION=$(grep -E '^ProjectVersion=' "$DEFAULT_GAME_INI" | head -n1 | cut -d= -f2 | tr -d '\r[:space:]')
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=$DEFAULT_GAME_INI::ProjectVersion '$VERSION' is missing or not in MAJOR.MINOR.PATCH format"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
+      - name: Check all versions match ProjectVersion
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          FAILED=0
+          check() { # $1 = file, $2 = found version
+            if [ "$2" != "$VERSION" ]; then
+              echo "::error file=$1::Version '$2' does not match ProjectVersion '$VERSION' in $DEFAULT_GAME_INI"
+              FAILED=1
+            else
+              echo "OK  $1 = $2"
+            fi
+          }
+          check "$UPROJECT" "$(jq -r '.VersionName // empty' "$UPROJECT")"
+          for PLUGIN in DeepSpaceStarter/Project/Plugins/*/*.uplugin; do
+            check "$PLUGIN" "$(jq -r '.VersionName // empty' "$PLUGIN")"
+          done
+          check "$AEF_CONFIG_INI" "$(grep -E '^Version=' "$AEF_CONFIG_INI" | head -n1 | cut -d= -f2 | tr -d '\r[:space:]')"
+          exit $FAILED
+
+      - name: Check tag does not exist yet
+        id: tag
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "::error::Tag $TAG already exists. Bump ProjectVersion in $DEFAULT_GAME_INI first."
+              exit 1
+            fi
+            echo "::notice::Tag $TAG already exists - nothing to release."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build release title
+        if: steps.tag.outputs.exists == 'false'
+        id: title
+        env:
+          INPUT_TITLE: ${{ inputs.release_title }}
+        run: |
+          TITLE="$INPUT_TITLE"
+          if [ -z "$TITLE" ]; then
+            ENGINE=$(jq -r '.EngineAssociation // empty' "$UPROJECT")
+            TITLE="UE $ENGINE Deep Space - StarterKit"
+          fi
+          echo "title=$TITLE (${{ steps.version.outputs.tag }})" >> "$GITHUB_OUTPUT"
+
+      - name: Create ZIP with LFS files
+        if: steps.tag.outputs.exists == 'false'
+        run: |
+          zip -r "UE-DeepSpace-Starter-${{ steps.version.outputs.version }}.zip" . \
+            -x ".git/*" ".github/*"
+
+      - name: Create tag and release
+        if: steps.tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.title.outputs.title }}
+          files: UE-DeepSpace-Starter-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
+          make_latest: true

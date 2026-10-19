@@ -1,0 +1,42 @@
+{
+	"FileVersion": 3,
+	"Version": 14,
+	"VersionName": "3.2.0",
+	"EngineVersion": "5.7.0",
+	"FriendlyName": "Ars Electronica Futurelab - Pharus Tracking",
+	"Description": "Pharus laser floor tracking for Unreal Engine: receives TrackLink UDP data, maps tracks onto the floor and spawns actors per track. GameInstance subsystem with INI configuration, global root origin, relative spawning and an nDisplay-safe actor pool.",
+	"Category": "Ars Electronica Futurelab",
+	"CreatedBy": "Ars Electronica Futurelab - Johannes Lugstein|Friedrich Bachinger|Otto Naderer",
+	"CreatedByURL": "https://ars.electronica.art/futurelab/",
+	"DocsURL": "https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/UE-5.7-DeepSpace-Starter/DeepSpaceStarter/Project/Plugins/AefPharus/README.md",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/issues",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AefPharus",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"Core",
+				"CoreUObject",
+				"Sockets",
+				"Networking"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "nDisplay",
+			"Enabled": true
+		},
+		{
+			"Name": "AefUtility",
+			"Enabled": true
+		}
+	]
+}
