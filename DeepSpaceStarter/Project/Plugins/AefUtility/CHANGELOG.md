@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.1] - 2026-10-20
+
+Version aligned with the DeepSpace Starter 3.2.1 release. No functional changes.
+
 ## [3.2.0] - 2026-10-19
 
 Version aligned with the DeepSpace Starter project version (shared version for project, plugins and `AefConfig.ini`).

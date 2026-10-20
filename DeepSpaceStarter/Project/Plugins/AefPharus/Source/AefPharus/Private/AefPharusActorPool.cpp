@@ -8,6 +8,7 @@
 #include "AefPharus.h"
 #include "AefPharusActorInterface.h"
 #include "Engine/World.h"
+#include "Engine/Level.h"
 #include "GameFramework/Actor.h"
 
 //--------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ bool UAefPharusActorPool::Initialize(
 	const FRotator& InSpawnRotation,
 	const FVector& InIndexOffset)
 {
-	if (!InWorld)
+	if (!IsValid(InWorld) || InWorld->bIsTearingDown)
 	{
 		UE_LOG(LogAefPharus, Error, TEXT("ActorPool: Cannot initialize - invalid World context"));
 		return false;
@@ -66,10 +67,10 @@ bool UAefPharusActorPool::Initialize(
 	for (int32 i = 0; i < InPoolSize; ++i)
 	{
 		AActor* Actor = SpawnPooledActor(i);
+		PooledActors.Add(Actor);
+		FreeIndices.Add(i);
 		if (Actor)
 		{
-			PooledActors.Add(Actor);
-			FreeIndices.Add(i);
 			SuccessCount++;
 		}
 		else
@@ -88,32 +89,39 @@ bool UAefPharusActorPool::Initialize(
 	else
 	{
 		UE_LOG(LogAefPharus, Error, TEXT("ActorPool: Initialization failed - no actors spawned"));
+		PooledActors.Empty();
+		FreeIndices.Empty();
+		WorldContext.Reset();
 	}
 
 	return bIsInitialized;
 }
 
-void UAefPharusActorPool::Shutdown()
+void UAefPharusActorPool::Shutdown(bool bDestroyActors)
 {
 	if (!bIsInitialized)
 	{
 		return;
 	}
 
-	UE_LOG(LogAefPharus, Log, TEXT("ActorPool: Shutting down, destroying %d actors"), PooledActors.Num());
+	UE_LOG(LogAefPharus, Log, TEXT("ActorPool: Shutting down, %s %d actors"),
+		bDestroyActors ? TEXT("destroying") : TEXT("releasing"), PooledActors.Num());
 
 	// Destroy all pooled actors
-	for (AActor* Actor : PooledActors)
+	if (bDestroyActors)
 	{
-		if (Actor && IsValid(Actor))
+		for (const TWeakObjectPtr<AActor>& ActorPtr : PooledActors)
 		{
-			Actor->Destroy();
+			if (AActor* Actor = ActorPtr.Get())
+			{
+				Actor->Destroy();
+			}
 		}
 	}
 
 	PooledActors.Empty();
 	FreeIndices.Empty();
-	WorldContext = nullptr;
+	WorldContext.Reset();
 	ActorClass = nullptr;
 	bIsInitialized = false;
 
@@ -140,25 +148,25 @@ AActor* UAefPharusActorPool::AcquireActor(int32& OutPoolIndex)
 		return nullptr;
 	}
 
-	// Get first free index
-	OutPoolIndex = FreeIndices[0];
-	FreeIndices.RemoveAt(0);
-
-	AActor* Actor = PooledActors[OutPoolIndex];
-	if (!Actor || !IsValid(Actor))
+	for (int32 FreeSlot = 0; FreeSlot < FreeIndices.Num(); ++FreeSlot)
 	{
-		UE_LOG(LogAefPharus, Error, TEXT("ActorPool: Actor at index %d is invalid"), OutPoolIndex);
-		OutPoolIndex = INDEX_NONE;
-		return nullptr;
+		const int32 PoolIndex = FreeIndices[FreeSlot];
+		AActor* Actor = PooledActors[PoolIndex].Get();
+		if (!Actor)
+		{
+			Actor = SpawnPooledActor(PoolIndex);
+			PooledActors[PoolIndex] = Actor;
+		}
+		if (Actor)
+		{
+			FreeIndices.RemoveAt(FreeSlot);
+			OutPoolIndex = PoolIndex;
+			ActivateActor(Actor);
+			return Actor;
+		}
 	}
-
-	// Activate actor
-	ActivateActor(Actor);
-
-	UE_LOG(LogAefPharus, Verbose, TEXT("ActorPool: Acquired actor at index %d (%d free remaining)"), 
-		OutPoolIndex, FreeIndices.Num());
-
-	return Actor;
+	OutPoolIndex = INDEX_NONE;
+	return nullptr;
 }
 
 bool UAefPharusActorPool::ReleaseActor(int32 PoolIndex)
@@ -182,10 +190,11 @@ bool UAefPharusActorPool::ReleaseActor(int32 PoolIndex)
 		return false;
 	}
 
-	AActor* Actor = PooledActors[PoolIndex];
-	if (!Actor || !IsValid(Actor))
+	AActor* Actor = PooledActors[PoolIndex].Get();
+	if (!Actor)
 	{
-		UE_LOG(LogAefPharus, Error, TEXT("ActorPool: Actor at index %d is invalid"), PoolIndex);
+		FreeIndices.Add(PoolIndex);
+		UE_LOG(LogAefPharus, Warning, TEXT("ActorPool: Actor at index %d is invalid - slot returned to pool"), PoolIndex);
 		return false;
 	}
 
@@ -220,7 +229,7 @@ AActor* UAefPharusActorPool::GetActorByIndex(int32 PoolIndex) const
 		return nullptr;
 	}
 
-	return PooledActors[PoolIndex];
+	return PooledActors[PoolIndex].Get();
 }
 
 //--------------------------------------------------------------------------------
@@ -229,7 +238,8 @@ AActor* UAefPharusActorPool::GetActorByIndex(int32 PoolIndex) const
 
 AActor* UAefPharusActorPool::SpawnPooledActor(int32 Index)
 {
-	if (!WorldContext || !ActorClass)
+	UWorld* World = WorldContext.Get();
+	if (!World || World->bIsTearingDown || !ActorClass)
 	{
 		return nullptr;
 	}
@@ -240,14 +250,25 @@ AActor* UAefPharusActorPool::SpawnPooledActor(int32 Index)
 	// Derive the name from the owning instance so every cluster node names the
 	// same actor identically (nDisplay matches synced actors by name)
 	FString InstanceToken = OwningInstanceName.ToString().Replace(TEXT(" "), TEXT("_"));
-	SpawnParams.Name = FName(*FString::Printf(TEXT("PharusPool_%s_%d"), *InstanceToken, Index));
+	const FName ActorName(*FString::Printf(TEXT("PharusPool_%s_%d"), *InstanceToken, Index));
+	SpawnParams.Name = ActorName;
+	SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Required_ErrorAndReturnNull;
 	SpawnParams.ObjectFlags |= RF_Transient; // Don't save pooled actors
+	// Destroyed actors retain their names until GC. Make the name available for a restart.
+	if (ULevel* Level = World->GetCurrentLevel())
+	{
+		UObject* Existing = StaticFindObjectFast(nullptr, Level, ActorName);
+		if (Existing && !IsValid(Existing))
+		{
+			Existing->Rename(nullptr, nullptr, REN_DontCreateRedirectors | REN_NonTransactional | REN_DoNotDirty);
+		}
+	}
 
 	// Calculate spawn location with index offset
 	FVector SpawnLocation = PoolSpawnLocation + (PoolIndexOffset * Index);
 	FRotator SpawnRotation = PoolSpawnRotation;
 
-	AActor* Actor = WorldContext->SpawnActor(ActorClass, &SpawnLocation, &SpawnRotation, SpawnParams);
+	AActor* Actor = World->SpawnActor(ActorClass, &SpawnLocation, &SpawnRotation, SpawnParams);
 	
 	if (Actor)
 	{

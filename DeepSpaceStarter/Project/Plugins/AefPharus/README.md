@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 3.2.0 |
+| Version | 3.2.1 |
 | Engine | Unreal Engine 5.7 |
 | Platform | Windows 64-bit |
 | Dependencies | nDisplay, AefUtility |
@@ -20,9 +20,10 @@ and spawns one actor per tracked person. It runs as a `UGameInstanceSubsystem`, 
 
 ```
 Pharus / TrackLink simulator ──UDP──► UAefPharusInstance (network thread)
-                                          │  relPos (0-1) → validate → normalize
+                                          │  queue track event and receive time
                                           ▼
                                    pending queue ──► game thread tick
+                                                        │  validate / map / update track
                                                         │  spawn / update / destroy actor
                                                         ▼
                                                  Actor implementing IAefPharusActorInterface
@@ -47,6 +48,12 @@ For each track the plugin uses the TrackLink `relPos` (normalized 0-1, TUIO orig
 6. Apply root rotation and root origin (`GlobalRotation`/`GlobalOrigin` or the `AAefPharusRootOriginActor`)
 
 With `UseRelativeSpawning=true` step 6 is skipped and actors are attached to the root origin actor instead.
+
+The tracker instance survives level changes. Actors and the optional pool are released with their level and
+rebuilt after the new level begins play; active tracks receive actors again. Absolute actors follow a moving
+root origin on the next game-thread tick, even without another tracking packet. Network callbacks only queue
+events; all configuration, origin and actor access runs on the game thread. Stopping a tracker checks the
+receive thread for shutdown every 100 ms.
 
 ---
 

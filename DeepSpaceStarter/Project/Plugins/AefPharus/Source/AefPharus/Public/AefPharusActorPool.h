@@ -91,7 +91,7 @@ public:
 	 * Shutdown and cleanup the pool
 	 * Destroys all pooled actors
 	 */
-	void Shutdown();
+	void Shutdown(bool bDestroyActors = true);
 
 	/**
 	 * Acquire a free actor from the pool
@@ -187,15 +187,13 @@ private:
 
 private:
 	/** All pooled actors (spawned on all nodes) */
-	UPROPERTY()
-	TArray<AActor*> PooledActors;
+	TArray<TWeakObjectPtr<AActor>> PooledActors;
 
 	/** Indices of free (available) actors */
 	TArray<int32> FreeIndices;
 
 	/** World context for spawning */
-	UPROPERTY()
-	UWorld* WorldContext;
+	TWeakObjectPtr<UWorld> WorldContext;
 
 	/** Actor class to spawn */
 	UPROPERTY()

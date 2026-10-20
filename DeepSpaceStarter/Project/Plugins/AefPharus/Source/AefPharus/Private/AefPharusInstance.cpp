@@ -38,19 +38,360 @@
 
 UAefPharusInstance::UAefPharusInstance()
 	: bIsRunning(false)
-	, WorldContext(nullptr)
 	, ActorPool(nullptr)
 {
-}
-
-UAefPharusInstance::~UAefPharusInstance()
-{
-	Shutdown();
 }
 
 //--------------------------------------------------------------------------------
 // Lifecycle
 //--------------------------------------------------------------------------------
+
+UWorld* UAefPharusInstance::GetWorld() const
+{
+	const UAefPharusSubsystem* Subsystem = Cast<UAefPharusSubsystem>(GetOuter());
+	return Subsystem ? Subsystem->GetWorld() : nullptr;
+}
+
+void UAefPharusInstance::BeginDestroy()
+{
+	// Only release non-UObject resources here: during garbage collection the pool and
+	// the actors may already be unreachable and must not be touched (Shutdown() does that).
+	ShutdownNetwork();
+	bIsRunning = false;
+
+	Super::BeginDestroy();
+}
+
+void UAefPharusInstance::ShutdownNetwork()
+{
+	// Unregister tick delegate
+	if (TickDelegateHandle.IsValid())
+	{
+		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+		TickDelegateHandle.Reset();
+	}
+
+	if (WorldTearDownHandle.IsValid())
+	{
+		FWorldDelegates::OnWorldBeginTearDown.Remove(WorldTearDownHandle);
+		WorldTearDownHandle.Reset();
+	}
+
+	// Unregister from TrackLinkClient (destructor joins the receive thread)
+	if (TrackLinkClient)
+	{
+		TrackLinkClient->unregisterTrackReceiver(this);
+		TrackLinkClient.Reset();
+	}
+}
+
+UWorld* UAefPharusInstance::GetUsableWorld() const
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World) || World->bIsTearingDown || !World->IsGameWorld() || !World->HasBegunPlay())
+	{
+		return nullptr;
+	}
+	return World;
+}
+
+bool UAefPharusInstance::RefreshWorldBinding()
+{
+	UWorld* CurrentWorld = GetUsableWorld();
+	if (CurrentWorld && CurrentWorld == BoundWorld.Get())
+	{
+		return true;
+	}
+
+	// Bound world changed, is being torn down or was garbage collected
+	if (!BoundWorld.IsExplicitlyNull())
+	{
+		ReleaseWorldActors();
+	}
+
+	if (!CurrentWorld)
+	{
+		return false;
+	}
+
+	BindToWorld(CurrentWorld);
+	return true;
+}
+
+void UAefPharusInstance::BindToWorld(UWorld* World)
+{
+	BoundWorld = World;
+
+	// (Re)build the actor pool in this world (runs on ALL cluster nodes)
+	if (Config.bUseActorPool && SpawnClass)
+	{
+		if (!ActorPool)
+		{
+			ActorPool = NewObject<UAefPharusActorPool>(this);
+		}
+
+		const bool bPoolInitialized = ActorPool->Initialize(
+			World,
+			SpawnClass,
+			Config.ActorPoolSize,
+			Config.InstanceName,
+			Config.PoolSpawnLocation,
+			Config.PoolSpawnRotation,
+			Config.PoolIndexOffset
+		);
+		if (bPoolInitialized)
+		{
+			UE_LOG(LogAefPharus, Log, TEXT("Instance '%s': Actor pool initialized with %d actors in world '%s'"),
+				*Config.InstanceName.ToString(), Config.ActorPoolSize, *World->GetName());
+		}
+		else
+		{
+			UE_LOG(LogAefPharus, Warning, TEXT("Instance '%s': Actor pool initialization failed - using dynamic spawning"),
+				*Config.InstanceName.ToString());
+			ActorPool = nullptr;
+		}
+	}
+
+	// Tracks that were active before a level change get an actor in the new world
+	int32 RequeuedCount = 0;
+	for (const TPair<int32, FAefPharusTrackData>& Pair : TrackDataCache)
+	{
+		if (!TracksOutsideBounds.Contains(Pair.Key))
+		{
+			PendingSpawns.AddUnique(Pair.Key);
+			++RequeuedCount;
+		}
+	}
+
+	UE_LOG(LogAefPharus, Log, TEXT("Instance '%s': bound to world '%s' (%d active track(s) queued for spawn)"),
+		*Config.InstanceName.ToString(), *World->GetName(), RequeuedCount);
+}
+
+void UAefPharusInstance::ReleaseWorldActors()
+{
+	// Actors in a world that keeps running are cleaned up. In a world that is being torn
+	// down they die with their level and must not be touched anymore.
+	UWorld* OldWorld = BoundWorld.Get();
+	const bool bDestroyActors = OldWorld && !OldWorld->bIsTearingDown;
+
+	if (ActorPool)
+	{
+		ActorPool->Shutdown(bDestroyActors);
+	}
+
+	// Pooled actors are already gone at this point; this catches dynamically spawned
+	// ones (also when the pool failed to initialize and spawning fell back to dynamic)
+	if (bDestroyActors)
+	{
+		for (const TPair<int32, TWeakObjectPtr<AActor>>& Pair : SpawnedActors)
+		{
+			if (AActor* Actor = Pair.Value.Get())
+			{
+				Actor->Destroy();
+			}
+		}
+	}
+	SpawnedActors.Empty();
+	TrackToPoolIndex.Empty();
+	bHasAppliedRoot = false;
+	AppliedRootActor.Reset();
+
+	if (!BoundWorld.IsExplicitlyNull())
+	{
+		UE_LOG(LogAefPharus, Log, TEXT("Instance '%s': released actors of world '%s'"),
+			*Config.InstanceName.ToString(), OldWorld ? *OldWorld->GetName() : TEXT("<destroyed>"));
+	}
+	BoundWorld.Reset();
+}
+
+void UAefPharusInstance::HandleWorldBeginTearDown(UWorld* World)
+{
+	if (World && World == BoundWorld.Get())
+	{
+		ReleaseWorldActors();
+	}
+}
+
+void UAefPharusInstance::EnqueueTrackEvent(FTrackEvent::EType Type, const pharus::TrackRecord& Track)
+{
+	FTrackEvent Event;
+	Event.Type = Type;
+	Event.Record = Track;
+	Event.ReceiveTime = FPlatformTime::Seconds();
+
+	FScopeLock Lock(&TrackEventMutex);
+	PendingTrackEvents.Add(MoveTemp(Event));
+}
+
+void UAefPharusInstance::ApplyTrackNew(const pharus::TrackRecord& Track, double ReceiveTime)
+{
+	// Use relPos (TUIO-normalized 0-1 coordinates) instead of currentPos (absolute meters)
+	// TUIO has origin top-left (Y=0 at top), flip Y to match UE coordinate system
+	const FVector2D InputPos = FVector2D(Track.relPos.x, 1.0f - Track.relPos.y);
+	const bool bIsValid = IsTrackPositionValid(InputPos);
+
+	if (!bIsValid)
+	{
+		// Track starts outside valid bounds - remember it but don't spawn
+		// Still add to TrackDataCache for timeout tracking!
+		TracksOutsideBounds.Add(Track.trackID);
+
+		FAefPharusTrackData TrackData;
+		TrackData.TrackID = Track.trackID;
+		TrackData.LastUpdateTime = ReceiveTime;
+		TrackData.bIsInsideBoundary = false;  // Outside bounds
+		TrackDataCache.Add(Track.trackID, TrackData);
+		
+		if (Config.bLogRejectedTracks)
+		{
+			const FVector2D NormalizedPos = NormalizeTrackPosition(InputPos);
+			UE_LOG(LogAefPharus, Warning, 
+				TEXT("[%s] Track %d outside bounds (new) - position (%.3f, %.3f) normalized (%.3f, %.3f) - waiting for valid position"),
+				*Config.InstanceName.ToString(), Track.trackID, 
+				InputPos.X, InputPos.Y, NormalizedPos.X, NormalizedPos.Y);
+		}
+		return;
+	}
+
+	// Track is valid - spawn actor
+	const FVector WorldPos = TrackToWorld(InputPos, Track);
+	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos, ReceiveTime);
+
+	PendingSpawns.AddUnique(Track.trackID);
+	TrackDataCache.Add(Track.trackID, TrackData);
+
+	if (Config.bLogTrackerSpawned)
+	{
+		// Debug: Show raw TUIO coordinates and transformed world position for mirroring diagnosis
+		UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d spawned at %s (Speed: %.2f cm/s) | RAW TUIO: (%.3f, %.3f) -> InputPos: (%.3f, %.3f)"),
+			*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString(), Track.speed * 100.0f,
+			Track.relPos.x, Track.relPos.y, InputPos.X, InputPos.Y);
+	}
+}
+
+void UAefPharusInstance::ApplyTrackUpdate(const pharus::TrackRecord& Track, double ReceiveTime)
+{
+	// Use relPos (TUIO-normalized 0-1 coordinates) instead of currentPos (absolute meters)
+	// TUIO has origin top-left (Y=0 at top), flip Y to match UE coordinate system
+	const FVector2D InputPos = FVector2D(Track.relPos.x, 1.0f - Track.relPos.y);
+	const bool bIsValid = IsTrackPositionValid(InputPos);
+
+	const bool bWasOutside = TracksOutsideBounds.Contains(Track.trackID);
+
+	if (!bIsValid)
+	{
+		// Track is outside valid bounds - always update timestamp for timeout tracking
+		FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
+		if (ExistingData)
+		{
+			ExistingData->LastUpdateTime = ReceiveTime;
+			ExistingData->bIsInsideBoundary = false;  // Track is outside bounds
+		}
+		else
+		{
+			// Track not in cache yet - add it for timeout tracking
+			FAefPharusTrackData TrackData;
+			TrackData.TrackID = Track.trackID;
+			TrackData.LastUpdateTime = ReceiveTime;
+			TrackData.bIsInsideBoundary = false;  // Outside bounds
+			TrackDataCache.Add(Track.trackID, TrackData);
+		}
+		
+		if (!bWasOutside)
+		{
+			// Track moved OUT of bounds - mark and remove actor
+			TracksOutsideBounds.Add(Track.trackID);
+			PendingRemovals.AddUnique(Track.trackID);
+			
+			if (Config.bLogRejectedTracks)
+			{
+				const FVector2D NormalizedPos = NormalizeTrackPosition(InputPos);
+				UE_LOG(LogAefPharus, Warning, 
+					TEXT("[%s] Track %d LEFT valid bounds - position (%.3f, %.3f) normalized (%.3f, %.3f) - removing actor"),
+					*Config.InstanceName.ToString(), Track.trackID, 
+					InputPos.X, InputPos.Y, NormalizedPos.X, NormalizedPos.Y);
+			}
+		}
+		// else: already outside, just updated timestamp
+		return;
+	}
+
+	// Track is inside valid bounds
+	if (bWasOutside)
+	{
+		// Track moved INTO bounds - spawn actor
+		TracksOutsideBounds.Remove(Track.trackID);
+
+		const FVector WorldPos = TrackToWorld(InputPos, Track);
+		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos, ReceiveTime);
+		
+		PendingSpawns.AddUnique(Track.trackID);
+		TrackDataCache.Add(Track.trackID, TrackData);
+		
+		if (Config.bLogTrackerSpawned)
+		{
+			UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d ENTERED valid bounds - spawning at %s"),
+				*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
+		}
+		return;
+	}
+
+	// Track is inside and was inside - normal update path
+	// Update LastUpdateTime to prevent timeout on static tracks
+	FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
+	if (!ExistingData)
+	{
+		// Edge case: Track was never properly spawned, spawn it now
+		const FVector WorldPos = TrackToWorld(InputPos, Track);
+		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos, ReceiveTime);
+		
+		PendingSpawns.AddUnique(Track.trackID);
+		TrackDataCache.Add(Track.trackID, TrackData);
+		
+		if (Config.bLogTrackerSpawned)
+		{
+			UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d spawned (recovery) at %s"),
+				*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
+		}
+		return;
+	}
+
+	// Recalculate world position with the current RootOrigin/RootRotation
+	const FVector WorldPos = TrackToWorld(InputPos, Track);
+	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos, ReceiveTime);
+
+	// Update the cached data (so actor always has correct position relative to RootOrigin)
+	*ExistingData = TrackData;
+
+	// Queue actor update (origin movement between packets is handled per frame in ProcessPendingOperations)
+	PendingUpdates.AddUnique(Track.trackID);
+
+	if (Config.bLogTrackerUpdated)
+	{
+		UE_LOG(LogAefPharus, VeryVerbose, TEXT("[%s] Track %d updated at %s"),
+			*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
+	}
+}
+
+void UAefPharusInstance::ApplyTrackLost(const pharus::TrackRecord& Track)
+{
+	// Clean up tracking state
+	const bool bWasOutside = TracksOutsideBounds.Contains(Track.trackID);
+	TracksOutsideBounds.Remove(Track.trackID);
+	
+	// Only queue removal if track had an actor (was inside bounds)
+	if (!bWasOutside)
+	{
+		PendingRemovals.AddUnique(Track.trackID);
+	}
+
+	if (Config.bLogTrackerRemoved)
+	{
+		UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d lost%s"),
+			*Config.InstanceName.ToString(), Track.trackID,
+			bWasOutside ? TEXT(" (was outside bounds)") : TEXT(""));
+	}
+}
 
 bool UAefPharusInstance::Initialize(const FAefPharusInstanceConfig& InConfig, UWorld* InWorld, TSubclassOf<AActor> InSpawnClass)
 {
@@ -68,7 +409,6 @@ bool UAefPharusInstance::Initialize(const FAefPharusInstanceConfig& InConfig, UW
 
 	Config = InConfig;
 	SpawnClass = InSpawnClass;
-	WorldContext = InWorld;
 
 	// Create TrackLinkClient
 	try
@@ -143,41 +483,15 @@ bool UAefPharusInstance::Initialize(const FAefPharusInstanceConfig& InConfig, UW
 		0.0f // Every frame
 	);
 
-	// Initialize actor pool if enabled (runs on ALL cluster nodes)
-	if (Config.bUseActorPool && InSpawnClass)
-	{
-		ActorPool = NewObject<UAefPharusActorPool>(this);
-		if (ActorPool)
-		{
-			bool bPoolInitialized = ActorPool->Initialize(
-				InWorld,
-				InSpawnClass,
-				Config.ActorPoolSize,
-				Config.InstanceName,
-				Config.PoolSpawnLocation,
-				Config.PoolSpawnRotation,
-				Config.PoolIndexOffset
-			);
-			if (bPoolInitialized)
-			{
-				UE_LOG(LogAefPharus, Log, TEXT("Instance '%s': Actor pool initialized with %d actors"),
-					*Config.InstanceName.ToString(), Config.ActorPoolSize);
-			}
-			else
-			{
-				UE_LOG(LogAefPharus, Warning, TEXT("Instance '%s': Actor pool initialization failed"),
-					*Config.InstanceName.ToString());
-				ActorPool = nullptr;
-			}
-		}
-	}
-	else if (!Config.bUseActorPool)
+	WorldTearDownHandle = FWorldDelegates::OnWorldBeginTearDown.AddUObject(this, &UAefPharusInstance::HandleWorldBeginTearDown);
+	if (!Config.bUseActorPool)
 	{
 		UE_LOG(LogAefPharus, Log, TEXT("Instance '%s': Actor pool disabled, using dynamic spawning"),
 			*Config.InstanceName.ToString());
 	}
 
 	bIsRunning = true;
+	RefreshWorldBinding();
 
 	UE_LOG(LogAefPharus, Log, TEXT("Instance '%s' initialized successfully (%s:%d)"),
 		*Config.InstanceName.ToString(),
@@ -194,42 +508,21 @@ void UAefPharusInstance::Shutdown()
 		return;
 	}
 
-	// Unregister tick delegate
-	if (TickDelegateHandle.IsValid())
-	{
-		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-		TickDelegateHandle.Reset();
-	}
+	// Stop network thread first so no new track operations get queued
+	ShutdownNetwork();
 
-	// Unregister from TrackLinkClient
-	if (TrackLinkClient)
-	{
-		TrackLinkClient->unregisterTrackReceiver(this);
-		TrackLinkClient.Reset();
-	}
+	// Destroy pooled and spawned actors (skipped if their world is being torn down)
+	ReleaseWorldActors();
+	ActorPool = nullptr;
 
-	// Shutdown actor pool if exists
-	if (ActorPool)
-	{
-		ActorPool->Shutdown();
-		ActorPool = nullptr;
-	}
-
-	// Destroy all spawned actors (only if not using pool)
-	if (!Config.bUseActorPool)
-	{
-		for (auto& Pair : SpawnedActors)
-		{
-			if (Pair.Value && IsValid(Pair.Value))
-			{
-				Pair.Value->Destroy();
-			}
-		}
-	}
-	
-	SpawnedActors.Empty();
-	TrackToPoolIndex.Empty();
+	// Network thread is stopped, so the event queue is no longer written
+	PendingTrackEvents.Empty();
 	TrackDataCache.Empty();
+	TracksOutsideBounds.Empty();
+	PendingSpawns.Empty();
+	PendingUpdates.Empty();
+	PendingRemovals.Empty();
+	bHasAppliedRoot = false;
 
 	bIsRunning = false;
 
@@ -242,180 +535,17 @@ void UAefPharusInstance::Shutdown()
 
 void UAefPharusInstance::onTrackNew(const pharus::TrackRecord& Track)
 {
-	// Use relPos (TUIO-normalized 0-1 coordinates) instead of currentPos (absolute meters)
-	// TUIO has origin top-left (Y=0 at top), flip Y to match UE coordinate system
-	const FVector2D InputPos = FVector2D(Track.relPos.x, 1.0f - Track.relPos.y);
-	const bool bIsValid = IsTrackPositionValid(InputPos);
-
-	FScopeLock Lock(&PendingOperationsMutex);
-
-	if (!bIsValid)
-	{
-		// Track starts outside valid bounds - remember it but don't spawn
-		// Still add to TrackDataCache for timeout tracking!
-		TracksOutsideBounds.Add(Track.trackID);
-		
-		FAefPharusTrackData TrackData;
-		TrackData.TrackID = Track.trackID;
-		TrackData.LastUpdateTime = FPlatformTime::Seconds();
-		TrackData.bIsInsideBoundary = false;  // Outside bounds
-		TrackDataCache.Add(Track.trackID, TrackData);
-		
-		if (Config.bLogRejectedTracks)
-		{
-			const FVector2D NormalizedPos = NormalizeTrackPosition(InputPos);
-			UE_LOG(LogAefPharus, Warning, 
-				TEXT("[%s] Track %d outside bounds (new) - position (%.3f, %.3f) normalized (%.3f, %.3f) - waiting for valid position"),
-				*Config.InstanceName.ToString(), Track.trackID, 
-				InputPos.X, InputPos.Y, NormalizedPos.X, NormalizedPos.Y);
-		}
-		return;
-	}
-
-	// Track is valid - spawn actor
-	const FVector WorldPos = TrackToWorld(InputPos, Track);
-	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
-
-	PendingSpawns.AddUnique(Track.trackID);
-	TrackDataCache.Add(Track.trackID, TrackData);
-
-	if (Config.bLogTrackerSpawned)
-	{
-		// Debug: Show raw TUIO coordinates and transformed world position for mirroring diagnosis
-		UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d spawned at %s (Speed: %.2f cm/s) | RAW TUIO: (%.3f, %.3f) -> InputPos: (%.3f, %.3f)"),
-			*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString(), Track.speed * 100.0f,
-			Track.relPos.x, Track.relPos.y, InputPos.X, InputPos.Y);
-	}
+	EnqueueTrackEvent(FTrackEvent::EType::New, Track);
 }
 
 void UAefPharusInstance::onTrackUpdate(const pharus::TrackRecord& Track)
 {
-	// Use relPos (TUIO-normalized 0-1 coordinates) instead of currentPos (absolute meters)
-	// TUIO has origin top-left (Y=0 at top), flip Y to match UE coordinate system
-	const FVector2D InputPos = FVector2D(Track.relPos.x, 1.0f - Track.relPos.y);
-	const bool bIsValid = IsTrackPositionValid(InputPos);
-
-	FScopeLock Lock(&PendingOperationsMutex);
-
-	const bool bWasOutside = TracksOutsideBounds.Contains(Track.trackID);
-
-	if (!bIsValid)
-	{
-		// Track is outside valid bounds - always update timestamp for timeout tracking
-		FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
-		if (ExistingData)
-		{
-			ExistingData->LastUpdateTime = FPlatformTime::Seconds();
-			ExistingData->bIsInsideBoundary = false;  // Track is outside bounds
-		}
-		else
-		{
-			// Track not in cache yet - add it for timeout tracking
-			FAefPharusTrackData TrackData;
-			TrackData.TrackID = Track.trackID;
-			TrackData.LastUpdateTime = FPlatformTime::Seconds();
-			TrackData.bIsInsideBoundary = false;  // Outside bounds
-			TrackDataCache.Add(Track.trackID, TrackData);
-		}
-		
-		if (!bWasOutside)
-		{
-			// Track moved OUT of bounds - mark and remove actor
-			TracksOutsideBounds.Add(Track.trackID);
-			PendingRemovals.AddUnique(Track.trackID);
-			
-			if (Config.bLogRejectedTracks)
-			{
-				const FVector2D NormalizedPos = NormalizeTrackPosition(InputPos);
-				UE_LOG(LogAefPharus, Warning, 
-					TEXT("[%s] Track %d LEFT valid bounds - position (%.3f, %.3f) normalized (%.3f, %.3f) - removing actor"),
-					*Config.InstanceName.ToString(), Track.trackID, 
-					InputPos.X, InputPos.Y, NormalizedPos.X, NormalizedPos.Y);
-			}
-		}
-		// else: already outside, just updated timestamp
-		return;
-	}
-
-	// Track is inside valid bounds
-	if (bWasOutside)
-	{
-		// Track moved INTO bounds - spawn actor
-		TracksOutsideBounds.Remove(Track.trackID);
-		
-		const FVector WorldPos = TrackToWorld(InputPos, Track);
-		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
-		
-		PendingSpawns.AddUnique(Track.trackID);
-		TrackDataCache.Add(Track.trackID, TrackData);
-		
-		if (Config.bLogTrackerSpawned)
-		{
-			UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d ENTERED valid bounds - spawning at %s"),
-				*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
-		}
-		return;
-	}
-
-	// Track is inside and was inside - normal update path
-	// Update LastUpdateTime to prevent timeout on static tracks
-	FAefPharusTrackData* ExistingData = TrackDataCache.Find(Track.trackID);
-	if (!ExistingData)
-	{
-		// Edge case: Track was never properly spawned, spawn it now
-		const FVector WorldPos = TrackToWorld(InputPos, Track);
-		const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
-		
-		PendingSpawns.AddUnique(Track.trackID);
-		TrackDataCache.Add(Track.trackID, TrackData);
-		
-		if (Config.bLogTrackerSpawned)
-		{
-			UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d spawned (recovery) at %s"),
-				*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
-		}
-		return;
-	}
-
-	ExistingData->LastUpdateTime = FPlatformTime::Seconds();
-
-	// ALWAYS recalculate world position (RootOrigin/RootRotation may have changed)
-	const FVector WorldPos = TrackToWorld(InputPos, Track);
-	const FAefPharusTrackData TrackData = ConvertTrackData(Track, WorldPos, InputPos);
-	
-	// Update the cached data (so actor always has correct position relative to RootOrigin)
-	TrackDataCache.FindOrAdd(Track.trackID) = TrackData;
-	
-	// Always queue update - even for static trackers we need to apply RootOrigin changes
-	PendingUpdates.AddUnique(Track.trackID);
-
-	if (Config.bLogTrackerUpdated)
-	{
-		UE_LOG(LogAefPharus, VeryVerbose, TEXT("[%s] Track %d updated at %s"),
-			*Config.InstanceName.ToString(), Track.trackID, *WorldPos.ToString());
-	}
+	EnqueueTrackEvent(FTrackEvent::EType::Update, Track);
 }
 
 void UAefPharusInstance::onTrackLost(const pharus::TrackRecord& Track)
 {
-	FScopeLock Lock(&PendingOperationsMutex);
-	
-	// Clean up tracking state
-	const bool bWasOutside = TracksOutsideBounds.Contains(Track.trackID);
-	TracksOutsideBounds.Remove(Track.trackID);
-	
-	// Only queue removal if track had an actor (was inside bounds)
-	if (!bWasOutside)
-	{
-		PendingRemovals.AddUnique(Track.trackID);
-	}
-
-	if (Config.bLogTrackerRemoved)
-	{
-		UE_LOG(LogAefPharus, Log, TEXT("[%s] Track %d lost%s"),
-			*Config.InstanceName.ToString(), Track.trackID,
-			bWasOutside ? TEXT(" (was outside bounds)") : TEXT(""));
-	}
+	EnqueueTrackEvent(FTrackEvent::EType::Lost, Track);
 }
 
 //--------------------------------------------------------------------------------
@@ -424,7 +554,6 @@ void UAefPharusInstance::onTrackLost(const pharus::TrackRecord& Track)
 
 bool UAefPharusInstance::GetTrackData(int32 TrackID, FVector& OutPosition, FRotator& OutRotation, bool& bOutIsInsideBoundary)
 {
-	FScopeLock Lock(&PendingOperationsMutex);
 	FAefPharusTrackData* Data = TrackDataCache.Find(TrackID);
 	if (!Data)
 	{
@@ -443,7 +572,6 @@ bool UAefPharusInstance::GetTrackData(int32 TrackID, FVector& OutPosition, FRota
 
 TArray<int32> UAefPharusInstance::GetActiveTrackIDs() const
 {
-	FScopeLock Lock(&PendingOperationsMutex);
 	TArray<int32> TrackIDs;
 	TrackDataCache.GetKeys(TrackIDs);
 	return TrackIDs;
@@ -451,20 +579,17 @@ TArray<int32> UAefPharusInstance::GetActiveTrackIDs() const
 
 int32 UAefPharusInstance::GetActiveTrackCount() const
 {
-	FScopeLock Lock(&PendingOperationsMutex);
 	return TrackDataCache.Num();
 }
 
 AActor* UAefPharusInstance::GetSpawnedActor(int32 TrackID)
 {
-	FScopeLock Lock(&ActorSpawnMutex);
-	AActor** ActorPtr = SpawnedActors.Find(TrackID);
-	return ActorPtr ? *ActorPtr : nullptr;
+	const TWeakObjectPtr<AActor>* ActorPtr = SpawnedActors.Find(TrackID);
+	return ActorPtr ? ActorPtr->Get() : nullptr;
 }
 
 bool UAefPharusInstance::IsTrackActive(int32 TrackID) const
 {
-	FScopeLock Lock(&PendingOperationsMutex);
 	return TrackDataCache.Contains(TrackID);
 }
 
@@ -595,7 +720,6 @@ bool UAefPharusInstance::RestartWithNewNetwork(const FString& NewBindNIC, int32 
 
 	// Save important state before shutdown
 	TSubclassOf<AActor> SavedSpawnClass = SpawnClass;
-	UWorld* SavedWorldContext = WorldContext;
 	FAefPharusInstanceConfig SavedConfig = Config;
 
 	// Update network settings in config
@@ -606,7 +730,7 @@ bool UAefPharusInstance::RestartWithNewNetwork(const FString& NewBindNIC, int32 
 	Shutdown();
 
 	// Reinitialize with new network settings
-	bool bSuccess = Initialize(SavedConfig, SavedWorldContext, SavedSpawnClass);
+	bool bSuccess = Initialize(SavedConfig, GetWorld(), SavedSpawnClass);
 
 	if (bSuccess)
 	{
@@ -623,34 +747,23 @@ bool UAefPharusInstance::RestartWithNewNetwork(const FString& NewBindNIC, int32 
 }
 
 //--------------------------------------------------------------------------------
-// Coordinate Transformation (Network Thread)
+// Coordinate Transformation (Game Thread)
 //--------------------------------------------------------------------------------
 
 FVector UAefPharusInstance::TrackToWorld(const FVector2D& TrackPos, const pharus::TrackRecord& Track) const
 {
-	return TrackToWorldFloor(TrackPos);
+	// Step 1: Handle coordinate normalization based on explicit flag
+	return NormalizedToWorld(NormalizeTrackPosition(TrackPos));
 }
 
-FVector UAefPharusInstance::TrackToWorldFloor(const FVector2D& TrackPos) const
+FVector UAefPharusInstance::NormalizedToWorld(const FVector2D& NormalizedPos) const
 {
-	// Step 1: Handle coordinate normalization based on explicit flag
-	FVector2D AdjustedPos = TrackPos;
+	return TrackToWorldFloor(NormalizedPos);
+}
 
-	if (Config.bUseNormalizedCoordinates)
-	{
-		// Input is already normalized (0-1 range)
-		UE_LOG(LogAefPharus, Verbose, TEXT("[%s] Using normalized floor coordinates (%.3f, %.3f)"),
-			*Config.InstanceName.ToString(), TrackPos.X, TrackPos.Y);
-	}
-	else
-	{
-		// Input is absolute world coordinates - normalize them
-		AdjustedPos.X = TrackPos.X / Config.TrackingSurfaceDimensions.X;
-		AdjustedPos.Y = TrackPos.Y / Config.TrackingSurfaceDimensions.Y;
-
-		UE_LOG(LogAefPharus, Verbose, TEXT("[%s] Normalized floor coordinates (%.3f, %.3f) → (%.3f, %.3f)"),
-			*Config.InstanceName.ToString(), TrackPos.X, TrackPos.Y, AdjustedPos.X, AdjustedPos.Y);
-	}
+FVector UAefPharusInstance::TrackToWorldFloor(const FVector2D& NormalizedPos) const
+{
+	FVector2D AdjustedPos = NormalizedPos;
 
 	// Step 2: Invert Y if needed
 	// For normalized coordinates (0-1, TUIO-style with origin top-left):
@@ -824,7 +937,8 @@ bool UAefPharusInstance::IsTrackPositionValid(const FVector2D& InputPos) const
 
 void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRecord& Track)
 {
-	if (!WorldContext || !SpawnClass)
+	UWorld* World = BoundWorld.Get();
+	if (!World || !SpawnClass)
 	{
 		return;
 	}
@@ -860,25 +974,26 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 #endif
 	//--------------------------------------------------------------------------------
 
-	// Check if actor already exists
+	// A destroyed actor must not block a replacement for the same track.
+	if (const TWeakObjectPtr<AActor>* Existing = SpawnedActors.Find(TrackID))
 	{
-		FScopeLock Lock(&ActorSpawnMutex);
-		if (SpawnedActors.Contains(TrackID))
+		if (Existing->IsValid())
 		{
 			return;
 		}
+		SpawnedActors.Remove(TrackID);
 	}
-
-	FAefPharusTrackData TrackDataCopy;
+	if (const int32* StalePoolIndex = TrackToPoolIndex.Find(TrackID))
 	{
-		FScopeLock Lock(&PendingOperationsMutex);
-		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
-		if (!TrackData)
+		if (ActorPool)
 		{
-			return;
+			ActorPool->ReleaseActor(*StalePoolIndex);
 		}
-		TrackDataCopy = *TrackData;
+		TrackToPoolIndex.Remove(TrackID);
 	}
+	const FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
+	if (!TrackData) return;
+	const FAefPharusTrackData TrackDataCopy = *TrackData;
 
 	AActor* SpawnedActor = nullptr;
 	int32 PoolIndex = INDEX_NONE;
@@ -942,7 +1057,7 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 
 			FVector SpawnLocation = TrackDataCopy.WorldPosition;
 			FRotator SpawnRotation = FRotator::ZeroRotator;
-			SpawnedActor = WorldContext->SpawnActor(SpawnClass, &SpawnLocation, &SpawnRotation, SpawnParams);
+			SpawnedActor = World->SpawnActor(SpawnClass, &SpawnLocation, &SpawnRotation, SpawnParams);
 
 			if (!SpawnedActor)
 			{
@@ -953,7 +1068,7 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 					*Config.InstanceName.ToString(), TrackID, *ActorName);
 				
 				// More aggressive search: find by exact name using FindObject
-				AActor* ExistingActor = FindObject<AActor>(WorldContext->GetCurrentLevel(), *ActorName);
+				AActor* ExistingActor = FindObject<AActor>(World->GetCurrentLevel(), *ActorName);
 				if (ExistingActor && IsValid(ExistingActor))
 				{
 					UE_LOG(LogAefPharus, Log, 
@@ -974,7 +1089,7 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 					
 					SpawnParams.Name = NAME_None;  // Let UE generate unique name
 					SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Required_Fatal;
-					SpawnedActor = WorldContext->SpawnActor(SpawnClass, &SpawnLocation, &SpawnRotation, SpawnParams);
+					SpawnedActor = World->SpawnActor(SpawnClass, &SpawnLocation, &SpawnRotation, SpawnParams);
 					
 					if (!SpawnedActor)
 					{
@@ -1006,25 +1121,8 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 			AAefPharusRootOriginActor* RootActor = Subsystem->GetRootOriginActor();
 			if (RootActor)
 			{
-				// Calculate LOCAL position (no RootOrigin/RootRotation applied)
-				const FVector2D InputPos = FVector2D(TrackDataCopy.RawPosition.X, TrackDataCopy.RawPosition.Y);
-				
-				// Get input position from cache (use original tracking coordinates)
-				FVector LocalPos;
-				{
-					FScopeLock Lock(&PendingOperationsMutex);
-					FAefPharusTrackData* CachedData = TrackDataCache.Find(TrackID);
-					if (CachedData)
-					{
-						// Recalculate LOCAL position from raw coordinates
-						pharus::TrackRecord DummyTrack;
-						LocalPos = TrackToLocal(CachedData->RawPosition, DummyTrack);
-					}
-					else
-					{
-						LocalPos = FVector::ZeroVector;
-					}
-				}
+				pharus::TrackRecord DummyTrack;
+				const FVector LocalPos = TrackToLocal(TrackDataCopy.RawPosition, DummyTrack);
 
 				// Attach to RootOriginActor if not already attached
 				if (SpawnedActor->GetAttachParentActor() != RootActor)
@@ -1089,10 +1187,7 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 		}
 
 		// Store actor reference
-		{
-			FScopeLock Lock(&ActorSpawnMutex);
-			SpawnedActors.Add(TrackID, SpawnedActor);
-		}
+		SpawnedActors.Add(TrackID, SpawnedActor);
 
 		// Broadcast event
 		OnTrackSpawned.Broadcast(TrackID, SpawnedActor);
@@ -1101,27 +1196,13 @@ void UAefPharusInstance::SpawnActorForTrack(int32 TrackID, const pharus::TrackRe
 
 void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackRecord& Track)
 {
-	AActor* Actor = nullptr;
-	{
-		FScopeLock Lock(&ActorSpawnMutex);
-		AActor** ActorPtr = SpawnedActors.Find(TrackID);
-		if (!ActorPtr || !IsValid(*ActorPtr))
-		{
-			return;
-		}
-		Actor = *ActorPtr;
-	}
-
-	FAefPharusTrackData TrackDataCopy;
-	{
-		FScopeLock Lock(&PendingOperationsMutex);
-		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
-		if (!TrackData)
-		{
-			return;
-		}
-		TrackDataCopy = *TrackData;
-	}
+	const TWeakObjectPtr<AActor>* ActorPtr = SpawnedActors.Find(TrackID);
+	AActor* Actor = ActorPtr ? ActorPtr->Get() : nullptr;
+	if (!Actor) return;
+	FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
+	if (!TrackData) return;
+	TrackData->WorldPosition = NormalizedToWorld(TrackData->RawPosition);
+	const FAefPharusTrackData TrackDataCopy = *TrackData;
 
 	// Get the owning subsystem to check for relative spawning mode
 	// UseRelativeSpawning in [PharusSubsystem] is the master switch
@@ -1133,6 +1214,11 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 		//--------------------------------------------------------------------------------
 		// RELATIVE SPAWNING MODE: Use local coordinates (actor is attached to RootOriginActor)
 		//--------------------------------------------------------------------------------
+		AAefPharusRootOriginActor* RootActor = Subsystem->GetRootOriginActor();
+		if (RootActor && Actor->GetAttachParentActor() != RootActor)
+		{
+			Actor->AttachToActor(RootActor, FAttachmentTransformRules::KeepRelativeTransform);
+		}
 		// Calculate LOCAL position from raw tracking coordinates
 		pharus::TrackRecord DummyTrack;
 		FVector LocalPos = TrackToLocal(TrackDataCopy.RawPosition, DummyTrack);
@@ -1200,12 +1286,8 @@ void UAefPharusInstance::UpdateActorForTrack(int32 TrackID, const pharus::TrackR
 
 void UAefPharusInstance::DestroyActorForTrack(int32 TrackID, const FString& Reason)
 {
-	AActor* Actor = nullptr;
-	{
-		FScopeLock Lock(&ActorSpawnMutex);
-		AActor** ActorPtr = SpawnedActors.Find(TrackID);
-		Actor = (ActorPtr && IsValid(*ActorPtr)) ? *ActorPtr : nullptr;
-	}
+	const TWeakObjectPtr<AActor>* ActorPtr = SpawnedActors.Find(TrackID);
+	AActor* Actor = ActorPtr ? ActorPtr->Get() : nullptr;
 
 	// Call OnTrackLost on actor BEFORE releasing/destroying
 	if (Actor && Actor->GetClass()->ImplementsInterface(UAefPharusActorInterface::StaticClass()))
@@ -1280,19 +1362,9 @@ void UAefPharusInstance::DestroyActorForTrack(int32 TrackID, const FString& Reas
 	}
 
 	// Remove from spawned actors map
-	{
-		FScopeLock Lock(&ActorSpawnMutex);
-		SpawnedActors.Remove(TrackID);
-	}
-
-	{
-		FScopeLock Lock(&PendingOperationsMutex);
-		TrackDataCache.Remove(TrackID);
-		// NOTE: Do NOT remove from TracksOutsideBounds here!
-		// If track left bounds, we want to keep tracking that state
-		// so we can re-spawn when it comes back.
-		// TracksOutsideBounds is only cleaned up in onTrackLost().
-	}
+	SpawnedActors.Remove(TrackID);
+	TrackDataCache.Remove(TrackID);
+	// Keep TracksOutsideBounds until ApplyTrackLost(), so a track can re-enter.
 
 	// Broadcast lost event
 	OnTrackLost.Broadcast(TrackID);
@@ -1309,20 +1381,76 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 		return true; // Keep ticking
 	}
 
-	TArray<int32> LocalSpawns, LocalUpdates, LocalRemovals;
-	TMap<int32, pharus::TrackRecord> LocalTrackData;
+	// Follow the current world: after a level change the actors and the pool are rebuilt
+	// in the new world. While no usable world exists (transition), actor operations pause.
+	const bool bHasWorld = RefreshWorldBinding();
 
-	// Copy pending operations under lock
+	// Take over the events queued by the network thread (the only cross-thread hand-off)
+	TArray<FTrackEvent> Events;
 	{
-		FScopeLock Lock(&PendingOperationsMutex);
-		LocalSpawns = PendingSpawns;
-		LocalUpdates = PendingUpdates;
-		LocalRemovals = PendingRemovals;
+		FScopeLock Lock(&TrackEventMutex);
+		Events = MoveTemp(PendingTrackEvents);
+	}
 
-		// Clear pending arrays
-		PendingSpawns.Empty();
-		PendingUpdates.Empty();
-		PendingRemovals.Empty();
+	// Apply them in arrival order: bounds checks and coordinate transformation run here,
+	// on the game thread, with the current config and root origin
+	for (const FTrackEvent& Event : Events)
+	{
+		switch (Event.Type)
+		{
+			case FTrackEvent::EType::New:
+				ApplyTrackNew(Event.Record, Event.ReceiveTime);
+				break;
+			case FTrackEvent::EType::Update:
+				ApplyTrackUpdate(Event.Record, Event.ReceiveTime);
+				break;
+			case FTrackEvent::EType::Lost:
+				ApplyTrackLost(Event.Record);
+				break;
+		}
+	}
+
+	TArray<int32> LocalSpawns = MoveTemp(PendingSpawns);
+	TArray<int32> LocalUpdates = MoveTemp(PendingUpdates);
+	TArray<int32> LocalRemovals = MoveTemp(PendingRemovals);
+	// Replace an externally destroyed actor even if its track has not moved.
+	if (bHasWorld)
+	{
+		for (const TPair<int32, TWeakObjectPtr<AActor>>& Pair : SpawnedActors)
+		{
+			if (!Pair.Value.IsValid() && TrackDataCache.Contains(Pair.Key) && !TracksOutsideBounds.Contains(Pair.Key))
+			{
+				LocalSpawns.AddUnique(Pair.Key);
+			}
+		}
+	}
+
+	// Absolute positions depend on the root origin. When it moves (moving stage, tracked
+	// origin) every actor follows in the same frame, not only when its next packet arrives.
+	// Attached actors (relative spawning) follow their parent on their own.
+	if (bHasWorld)
+	{
+		const FVector RootOrigin = GetRootOrigin();
+		const FRotator RootRotation = GetRootOriginRotation();
+		const bool bRootMoved = !bHasAppliedRoot
+			|| !RootOrigin.Equals(AppliedRootOrigin)
+			|| !RootRotation.Equals(AppliedRootRotation);
+		AppliedRootOrigin = RootOrigin;
+		AppliedRootRotation = RootRotation;
+		bHasAppliedRoot = true;
+
+		UAefPharusSubsystem* Subsystem = Cast<UAefPharusSubsystem>(GetOuter());
+		const bool bUseRelativeSpawning = Subsystem && Subsystem->IsRelativeSpawningActive();
+		AAefPharusRootOriginActor* CurrentRootActor = bUseRelativeSpawning ? Subsystem->GetRootOriginActor() : nullptr;
+		const bool bRootActorChanged = AppliedRootActor.Get() != CurrentRootActor;
+		AppliedRootActor = CurrentRootActor;
+		if ((bRootMoved && !bUseRelativeSpawning) || bRootActorChanged)
+		{
+			for (const TPair<int32, TWeakObjectPtr<AActor>>& Pair : SpawnedActors)
+			{
+				LocalUpdates.AddUnique(Pair.Key);
+			}
+		}
 	}
 
 	// Process removals FIRST to avoid conflicts with spawns
@@ -1336,11 +1464,11 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 		}
 	}
 
-	// Process spawns
-	for (int32 TrackID : LocalSpawns)
+	// Process spawns (SpawnActorForTrack skips tracks that are no longer in TrackDataCache).
+	// Without a world the spawns are dropped: BindToWorld() re-queues every active track.
+	if (bHasWorld)
 	{
-		FAefPharusTrackData* TrackData = TrackDataCache.Find(TrackID);
-		if (TrackData)
+		for (int32 TrackID : LocalSpawns)
 		{
 			pharus::TrackRecord DummyTrack;
 			DummyTrack.trackID = TrackID;
@@ -1352,7 +1480,7 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 	for (int32 TrackID : LocalUpdates)
 	{
 		// Skip if track was just spawned (already has latest data)
-		if (!LocalSpawns.Contains(TrackID))
+		if (bHasWorld && !LocalSpawns.Contains(TrackID))
 		{
 			pharus::TrackRecord DummyTrack;
 			DummyTrack.trackID = TrackID;
@@ -1367,29 +1495,26 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 		double CurrentTime = FPlatformTime::Seconds();
 		TArray<int32> TimedOutTracks;
 
+		// Check all active tracks for timeout
+		for (const auto& Pair : TrackDataCache)
 		{
-			FScopeLock Lock(&PendingOperationsMutex);
-			// Check all active tracks for timeout
-			for (const auto& Pair : TrackDataCache)
+			double TimeSinceLastUpdate = CurrentTime - Pair.Value.LastUpdateTime;
+			if (TimeSinceLastUpdate > Config.TrackLostTimeout)
 			{
-				double TimeSinceLastUpdate = CurrentTime - Pair.Value.LastUpdateTime;
-				if (TimeSinceLastUpdate > Config.TrackLostTimeout)
-				{
-					TimedOutTracks.Add(Pair.Key);
+				TimedOutTracks.Add(Pair.Key);
 
-					if (Config.bLogTrackerRemoved)
-					{
-						UE_LOG(LogAefPharus, Warning, TEXT("[%s] Track %d timed out (no UDP updates for %.1fs) - treating as lost"),
-							*Config.InstanceName.ToString(), Pair.Key, TimeSinceLastUpdate);
-					}
+				if (Config.bLogTrackerRemoved)
+				{
+					UE_LOG(LogAefPharus, Warning, TEXT("[%s] Track %d timed out (no UDP updates for %.1fs) - treating as lost"),
+						*Config.InstanceName.ToString(), Pair.Key, TimeSinceLastUpdate);
 				}
 			}
-			
-			// Also clean up TracksOutsideBounds for timed-out tracks
-			for (int32 TrackID : TimedOutTracks)
-			{
-				TracksOutsideBounds.Remove(TrackID);
-			}
+		}
+
+		// Also clean up TracksOutsideBounds for timed-out tracks
+		for (int32 TrackID : TimedOutTracks)
+		{
+			TracksOutsideBounds.Remove(TrackID);
 		}
 
 		// Process timed-out tracks as if they were lost
@@ -1406,7 +1531,7 @@ bool UAefPharusInstance::ProcessPendingOperations(float DeltaTime)
 // Helper Functions
 //--------------------------------------------------------------------------------
 
-FAefPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const
+FAefPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos, double ReceiveTime) const
 {
 	FAefPharusTrackData Data;
 	Data.TrackID = Track.trackID;
@@ -1453,7 +1578,7 @@ FAefPharusTrackData UAefPharusInstance::ConvertTrackData(const pharus::TrackReco
 	}
 
 	// Update timestamp for timeout detection (UDP packet received)
-	Data.LastUpdateTime = FPlatformTime::Seconds();
+	Data.LastUpdateTime = ReceiveTime;
 
 	// ConvertTrackData is only called for tracks inside valid bounds
 	Data.bIsInsideBoundary = true;
@@ -1507,7 +1632,8 @@ void UAefPharusInstance::DebugInjectTrack(float NormalizedX, float NormalizedY, 
 
 AActor* UAefPharusInstance::FindExistingActorByName(int32 TrackID) const
 {
-	if (!WorldContext)
+	UWorld* World = BoundWorld.Get();
+	if (!World)
 	{
 		return nullptr;
 	}
@@ -1518,7 +1644,7 @@ AActor* UAefPharusInstance::FindExistingActorByName(int32 TrackID) const
 		*Config.InstanceName.ToString(), TrackID);
 
 	// Search for existing actor with this name (or name with UE suffix) in the world
-	for (TActorIterator<AActor> It(WorldContext); It; ++It)
+	for (TActorIterator<AActor> It(World); It; ++It)
 	{
 		AActor* Actor = *It;
 		if (!Actor || !IsValid(Actor))

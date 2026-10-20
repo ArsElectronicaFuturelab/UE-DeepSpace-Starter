@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 3.2.0 |
+| Version | 3.2.1 |
 | Engine | Unreal Engine 5.7 |
 | Platform | Windows 64-bit |
 | Module | `AefUtility` (Runtime) |

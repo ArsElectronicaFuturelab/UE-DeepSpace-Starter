@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 2,
-	"VersionName": "3.2.0",
+	"Version": 3,
+	"VersionName": "3.2.1",
 	"EngineVersion": "5.7.0",
 	"FriendlyName": "Ars Electronica Futurelab - Utility",
 	"Description": "Shared utilities for the Ars Electronica Futurelab plugins: resolves the active AefConfig.ini (default or -aefConfig= override) and stages it as a loose, editable file in packaged builds.",
