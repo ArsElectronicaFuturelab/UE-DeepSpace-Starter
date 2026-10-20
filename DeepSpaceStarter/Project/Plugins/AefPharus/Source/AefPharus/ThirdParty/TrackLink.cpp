@@ -11,12 +11,27 @@
 #include "UDPManager.h"
 
 #include "AefPharus.h" // Module logging
+#include <chrono>
 #include <string>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 
 using namespace pharus;
+
+namespace
+{
+	constexpr long ReceivePollIntervalMs = 100;
+	constexpr long BindRetryIntervalMs = 1000;
+
+	void SleepUnlessExiting(const std::atomic<bool>& bExit, long TotalMs)
+	{
+		for (long SleptMs = 0; SleptMs < TotalMs && !bExit; SleptMs += ReceivePollIntervalMs)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(ReceivePollIntervalMs));
+		}
+	}
+}
 
 ITrackReceiver::ITrackReceiver()
 {}
@@ -104,7 +119,7 @@ void TrackLinkClient::receiveData()
         if (!udpman->Create())
         {
 			UE_LOG(LogAefPharus, Log, TEXT("TrackLinkClient: Unable to create socket, retrying..."));
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			SleepUnlessExiting(threadExit, BindRetryIntervalMs);
             udpman.reset();  // Explicit reset (automatic on reassignment anyway)
             continue;
         }
@@ -124,14 +139,14 @@ void TrackLinkClient::receiveData()
         if (!bindOK)
         {
 			UE_LOG(LogAefPharus, Warning, TEXT("TrackLinkClient: Unable to bind socket to port %d, retrying..."), port);
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			SleepUnlessExiting(threadExit, BindRetryIntervalMs);
             udpman->Close();
             udpman.reset();
             continue;
         }
 
         UE_LOG(LogAefPharus, Log, TEXT("TrackLinkClient: Successfully bound to port %d"), port);
-        udpman->SetTimeoutReceive(1);
+        udpman->SetTimeoutReceiveMs(ReceivePollIntervalMs);
         connGood = true;
     }
 

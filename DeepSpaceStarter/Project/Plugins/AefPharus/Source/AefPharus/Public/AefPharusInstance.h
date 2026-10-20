@@ -22,6 +22,8 @@
 #include "TrackLink.h"
 #include "AefPharusInstance.generated.h"
 
+class AAefPharusRootOriginActor;
+
 /**
  * Pharus Tracker Instance
  *
@@ -39,7 +41,8 @@ class AEFPHARUS_API UAefPharusInstance : public UObject, public pharus::ITrackRe
 
 public:
 	UAefPharusInstance();
-	virtual ~UAefPharusInstance() override;
+	virtual UWorld* GetWorld() const override;
+	virtual void BeginDestroy() override;
 
 	//--------------------------------------------------------------------------------
 	// Lifecycle
@@ -240,8 +243,25 @@ private:
 	/** Actor class to spawn for tracks */
 	TSubclassOf<AActor> SpawnClass;
 
-	/** World context for actor spawning */
-	UWorld* WorldContext;
+	/** World containing the actor state; weak so level changes cannot retain it. */
+	TWeakObjectPtr<UWorld> BoundWorld;
+	FDelegateHandle WorldTearDownHandle;
+
+	struct FTrackEvent
+	{
+		enum class EType : uint8 { New, Update, Lost };
+		EType Type = EType::Update;
+		pharus::TrackRecord Record;
+		double ReceiveTime = 0.0;
+	};
+
+	/** The network thread only writes this queue. All track state belongs to the game thread. */
+	TArray<FTrackEvent> PendingTrackEvents;
+	FCriticalSection TrackEventMutex;
+	void EnqueueTrackEvent(FTrackEvent::EType Type, const pharus::TrackRecord& Track);
+	void ApplyTrackNew(const pharus::TrackRecord& Track, double ReceiveTime);
+	void ApplyTrackUpdate(const pharus::TrackRecord& Track, double ReceiveTime);
+	void ApplyTrackLost(const pharus::TrackRecord& Track);
 
 	//--------------------------------------------------------------------------------
 	// Track Management
@@ -255,14 +275,10 @@ private:
 	TMap<int32, int32> TrackToPoolIndex;
 
 	/** Spawned actors mapped by track ID */
-	UPROPERTY()
-	TMap<int32, AActor*> SpawnedActors;
+	TMap<int32, TWeakObjectPtr<AActor>> SpawnedActors;
 
 	/** Track data cache for Blueprint access */
 	TMap<int32, FAefPharusTrackData> TrackDataCache;
-
-	/** Mutex for thread-safe actor spawning */
-	mutable FCriticalSection ActorSpawnMutex;
 
 	/** Pending spawn operations (processed on game thread) */
 	TArray<int32> PendingSpawns;
@@ -272,8 +288,10 @@ private:
 	/** Tracks that are known but currently outside valid bounds (no actor spawned) */
 	TSet<int32> TracksOutsideBounds;
 
-	/** Mutex for pending operation lists */
-	mutable FCriticalSection PendingOperationsMutex;
+	FVector AppliedRootOrigin = FVector::ZeroVector;
+	FRotator AppliedRootRotation = FRotator::ZeroRotator;
+	TWeakObjectPtr<AAefPharusRootOriginActor> AppliedRootActor;
+	bool bHasAppliedRoot = false;
 
 	//--------------------------------------------------------------------------------
 	// Coordinate Transformation
@@ -283,6 +301,7 @@ private:
 	 * Transform 2D tracking position to 3D world position
 	 */
 	FVector TrackToWorld(const FVector2D& TrackPos, const pharus::TrackRecord& Track) const;
+	FVector NormalizedToWorld(const FVector2D& NormalizedPos) const;
 
 	/**
 	 * Floor mapping: Direct 2D→3D with scale and offset
@@ -366,6 +385,12 @@ private:
 
 	/** Tick delegate handle */
 	FTSTicker::FDelegateHandle TickDelegateHandle;
+	UWorld* GetUsableWorld() const;
+	bool RefreshWorldBinding();
+	void BindToWorld(UWorld* World);
+	void ReleaseWorldActors();
+	void HandleWorldBeginTearDown(UWorld* World);
+	void ShutdownNetwork();
 
 	//--------------------------------------------------------------------------------
 	// Helpers
@@ -377,7 +402,7 @@ private:
 	 * @param WorldPos Calculated world position
 	 * @param InputPos Input tracking coordinates (will be normalized if needed for RawPosition)
 	 */
-	FAefPharusTrackData ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos) const;
+	FAefPharusTrackData ConvertTrackData(const pharus::TrackRecord& Track, const FVector& WorldPos, const FVector2D& InputPos, double ReceiveTime) const;
 
 	/**
 	 * Get FRotator from movement direction (Yaw rotation around World Z)

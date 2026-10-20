@@ -5,6 +5,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.1] - 2026-10-20
+
+### Fixed
+- Tracker instances survive level changes without retaining the old world; active floor tracks receive actors
+  and a rebuilt pool after the new level begins play.
+- Destroyed pooled actors are replaced in their original deterministic slot. Restarting a pool in the same
+  world no longer crashes on actor name collisions.
+- Network callbacks only queue timestamped events. Bounds checks, coordinate mapping, configuration reads,
+  root-origin access and actor updates now run on the game thread.
+- Absolute actors follow a moving root origin each frame. Relative actors attach if the root origin actor
+  registers after they spawn.
+- Tracker shutdown, restart and garbage collection no longer wait up to a second for the receive thread.
+
+---
+
 ## [3.2.0] - 2026-10-15
 
 ### Added

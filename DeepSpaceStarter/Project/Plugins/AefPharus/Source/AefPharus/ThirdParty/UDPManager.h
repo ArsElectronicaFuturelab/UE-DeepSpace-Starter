@@ -115,7 +115,11 @@ public:
 	}
 	void SetTimeoutReceive(long timeoutInSeconds)
 	{
-		m_lTimeoutReceive= timeoutInSeconds;
+		m_lTimeoutReceiveMs= (timeoutInSeconds == NO_TIMEOUT) ? NO_TIMEOUT : timeoutInSeconds * 1000;
+	}
+	void SetTimeoutReceiveMs(long timeoutInMilliseconds)
+	{
+		m_lTimeoutReceiveMs= timeoutInMilliseconds;
 	}
 	long GetTimeoutSend() const
 	{
@@ -123,7 +127,11 @@ public:
 	}
 	long GetTimeoutReceive() const
 	{
-		return m_lTimeoutReceive;
+		return (m_lTimeoutReceiveMs == NO_TIMEOUT) ? NO_TIMEOUT : m_lTimeoutReceiveMs / 1000;
+	}
+	long GetTimeoutReceiveMs() const
+	{
+		return m_lTimeoutReceiveMs;
 	}
 
 	static bool GetLocalHost(char* pName, char* pAddress, char* pBroadcast);
@@ -143,7 +151,7 @@ protected:
 
 	SOCKET m_hSocket;
 
-	long m_lTimeoutReceive;
+	long m_lTimeoutReceiveMs;
 	long m_lTimeoutSend;
 
 	InetAddr m_saRemote;

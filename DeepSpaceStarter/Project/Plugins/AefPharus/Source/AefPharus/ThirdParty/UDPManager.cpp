@@ -33,7 +33,7 @@ UDPManager::UDPManager()
 ///#endif
 
 	m_hSocket= INVALID_SOCKET;
-	m_lTimeoutReceive= DEFAULT_TIMEOUT;
+	m_lTimeoutReceiveMs= DEFAULT_TIMEOUT;
 	m_lTimeoutSend= DEFAULT_TIMEOUT;
 
 	m_nLastError = 0;
@@ -501,12 +501,12 @@ int	UDPManager::Receive(void* pBuff, const int iSize)
 		return(SOCKET_ERROR);
 	}
 
-	if (m_lTimeoutReceive != NO_TIMEOUT)
+	if (m_lTimeoutReceiveMs != NO_TIMEOUT)
 	{
 		fd_set fd;
 		FD_ZERO(&fd);
 		FD_SET(m_hSocket, &fd);
-		struct timeval tv= { m_lTimeoutReceive, 0 };
+		struct timeval tv= { m_lTimeoutReceiveMs / 1000, (m_lTimeoutReceiveMs % 1000) * 1000 };
 		int ret = select((int)m_hSocket+1, &fd, NULL, NULL, &tv);
 		if (ret == 0)
 		{
