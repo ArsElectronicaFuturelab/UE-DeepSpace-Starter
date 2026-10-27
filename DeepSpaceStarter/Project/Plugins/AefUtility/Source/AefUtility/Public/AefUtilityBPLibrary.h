@@ -4,7 +4,7 @@
    AefUtility - Blueprint Function Library
 
    Resolves the active AefConfig.ini: <Project>/Config/AefConfig.ini by default,
-   or the file given with the command-line argument -aefConfig=<path>.
+   or the file given with the command-line argument -dsConfig=<path>.
   ========================================================================*/
 
 #pragma once
@@ -16,13 +16,13 @@
 UENUM(BlueprintType)
 enum class EAefConfigSource : uint8
 {
-	/** No aefConfig= argument; <Project>/Config/AefConfig.ini is used. */
+	/** No dsConfig= argument; <Project>/Config/AefConfig.ini is used. */
 	Default,
-	/** aefConfig= was given and the file exists. */
+	/** dsConfig= was given and the file exists. */
 	Override,
-	/** aefConfig= was given but the file does not exist; the default path is used instead. */
+	/** dsConfig= was given but the file does not exist; the default path is used instead. */
 	OverrideMissingFallback,
-	/** No aefConfig= argument and the default file does not exist either. */
+	/** No dsConfig= argument and the default file does not exist either. */
 	DefaultMissing
 };
 
@@ -31,7 +31,7 @@ struct FAefConfigResolution
 {
 	/** Normalized path of the file to read (the default path on fallback). */
 	FString Path;
-	/** aefConfig= value resolved to a full path; empty when no override was given. */
+	/** dsConfig= value resolved to a full path; empty when no override was given. */
 	FString RequestedOverride;
 	EAefConfigSource Source = EAefConfigSource::Default;
 };
@@ -52,16 +52,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AEF|Utility")
 	static EAefConfigSource GetConfigSource();
 
-	// GetRequestedOverridePath: full path requested via aefConfig=, empty when none was given.
+	// GetRequestedOverridePath: full path requested via dsConfig=, empty when none was given.
 	UFUNCTION(BlueprintPure, Category = "AEF|Utility")
 	static FString GetRequestedOverridePath();
 
-	// IsConfigWritable: false when aefConfig= points to a missing file. Writing would then
+	// IsConfigWritable: false when dsConfig= points to a missing file. Writing would then
 	// modify the default file instead of the requested one. OutReason explains why.
 	static bool IsConfigWritable(FString& OutReason);
 
 	// ResolveConfigFilePath: same resolution as GetConfigFilePath, but reads the
-	// aefConfig= argument from the given command line instead of FCommandLine::Get().
+	// dsConfig= argument from the given command line instead of FCommandLine::Get().
 	// Relative paths are resolved against FPaths::ProjectDir(). Pass nullptr to
 	// use the real command line. Not cached and does not log.
 	static FString ResolveConfigFilePath(const TCHAR* CommandLineOverride);

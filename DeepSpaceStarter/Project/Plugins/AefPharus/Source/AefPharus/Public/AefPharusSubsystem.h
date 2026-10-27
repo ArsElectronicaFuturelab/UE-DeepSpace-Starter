@@ -27,7 +27,7 @@ class AAefPharusRootOriginActor;
  *
  * GameInstance Subsystem for managing multiple Pharus tracking instances.
  * Automatically initializes from the active AefConfig.ini on startup
- * (Config/AefConfig.ini or the -aefConfig=<path> override, resolved by AefUtility).
+ * (Config/AefConfig.ini or the -dsConfig=<path> override, resolved by AefUtility).
  *
  * Features:
  * - Multi-instance support (one instance per tracking surface / UDP port)

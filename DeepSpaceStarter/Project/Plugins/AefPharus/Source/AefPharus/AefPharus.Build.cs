@@ -41,7 +41,7 @@ public class AefPharus : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"AefUtility"         // Resolves the active AefConfig.ini (default or -aefConfig= override)
+				"AefUtility"         // Resolves the active AefConfig.ini (default or -dsConfig= override)
 			}
 		);
 	}

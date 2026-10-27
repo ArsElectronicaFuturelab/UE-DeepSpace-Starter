@@ -649,7 +649,7 @@ void UAefPharusSubsystem::LoadConfigurationFromIni()
 	{
 		UE_LOG(LogAefPharus, Warning, TEXT("Configuration file not found: %s"), *ConfigPath);
 		UE_LOG(LogAefPharus, Warning, TEXT("No tracker instances will be created automatically."));
-		UE_LOG(LogAefPharus, Warning, TEXT("You can create instances manually via Blueprint, create Config/AefConfig.ini or pass -aefConfig=<path> (see Plugins/AefPharus/README.md)."));
+		UE_LOG(LogAefPharus, Warning, TEXT("You can create instances manually via Blueprint, create Config/AefConfig.ini or pass -dsConfig=<path> (see Plugins/AefPharus/README.md)."));
 		return;
 	}
 
@@ -1020,7 +1020,7 @@ FAefPharusInstanceConfig UAefPharusSubsystem::ParseInstanceConfigFromIni(const F
 
 FString UAefPharusSubsystem::GetConfigFilePath() const
 {
-	// Default <Project>/Config/AefConfig.ini or the -aefConfig=<path> override
+	// Default <Project>/Config/AefConfig.ini or the -dsConfig=<path> override
 	return UAefUtilityBPLibrary::GetConfigFilePath();
 }
 

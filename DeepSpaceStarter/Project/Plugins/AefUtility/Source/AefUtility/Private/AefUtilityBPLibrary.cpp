@@ -31,7 +31,7 @@ namespace AefUtilityConfigCache
 			UE_LOG(LogAefUtility, Display, TEXT("Using config override: %s"), *Result.Path);
 			break;
 		case EAefConfigSource::OverrideMissingFallback:
-			UE_LOG(LogAefUtility, Error, TEXT("aefConfig override '%s' not found, falling back to default config: %s"),
+			UE_LOG(LogAefUtility, Error, TEXT("dsConfig override '%s' not found, falling back to default config: %s"),
 				*Result.RequestedOverride, *Result.Path);
 			break;
 		case EAefConfigSource::DefaultMissing:
@@ -69,7 +69,7 @@ bool UAefUtilityBPLibrary::IsConfigWritable(FString& OutReason)
 	const FAefConfigResolution Resolution = GetActiveResolution();
 	if (Resolution.Source == EAefConfigSource::OverrideMissingFallback)
 	{
-		OutReason = FString::Printf(TEXT("aefConfig override '%s' does not exist. Writing is blocked so the default config '%s' is not modified by mistake."),
+		OutReason = FString::Printf(TEXT("dsConfig override '%s' does not exist. Writing is blocked so the default config '%s' is not modified by mistake."),
 			*Resolution.RequestedOverride, *Resolution.Path);
 		return false;
 	}
@@ -93,11 +93,11 @@ FAefConfigResolution UAefUtilityBPLibrary::ResolveConfig(const TCHAR* CommandLin
 	Result.Source = FPaths::FileExists(DefaultPath) ? EAefConfigSource::Default : EAefConfigSource::DefaultMissing;
 
 	FString CustomConfigPath;
-	if (FParse::Value(*CommandLine, TEXT("aefConfig="), CustomConfigPath))
+	if (FParse::Value(*CommandLine, TEXT("dsConfig="), CustomConfigPath))
 	{
 		if (CustomConfigPath.IsEmpty())
 		{
-			// An empty aefConfig= is a misconfiguration, not a request for the default.
+			// An empty dsConfig= is a misconfiguration, not a request for the default.
 			Result.Source = EAefConfigSource::OverrideMissingFallback;
 			return Result;
 		}

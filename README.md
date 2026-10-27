@@ -109,7 +109,7 @@ C++ plugin for Pharus laser tracking integration (included with pre-compiled bin
 Shared C++ plugin used by AefPharus (included with pre-compiled binaries).
 
 **Features:**
-- Resolves the active configuration file: `Project/Config/AefConfig.ini`, or the file given with `-aefConfig=<path>`
+- Resolves the active configuration file: `Project/Config/AefConfig.ini`, or the file given with `-dsConfig=<path>`
 - Copies `AefConfig.ini` automatically into packaged builds as a loose, editable file
 
 **Documentation:** See [AefUtility README](DeepSpaceStarter/Project/Plugins/AefUtility/README.md).
@@ -183,7 +183,7 @@ The project uses the following Unreal Engine plugins:
 Configuration file: `Project/Config/AefConfig.ini`
 
 - Loaded at startup by the AefUtility plugin; restart after changes.
-- Use a different file with the command-line argument `-aefConfig=<path>` (relative paths start at the project directory, e.g. in `project.json` → `args`).
+- Use a different file with the command-line argument `-dsConfig=<path>` (relative paths start at the project directory, e.g. in `project.json` → `args`).
 - Packaged builds contain the file automatically at `Build/Windows/DeepSpaceStarter/Config/AefConfig.ini`, where it can be edited on site.
 
 See the [AefPharus Plugin Documentation](DeepSpaceStarter/Project/Plugins/AefPharus/README.md) for detailed configuration options.

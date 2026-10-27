@@ -1,10 +1,10 @@
 {
 	"FileVersion": 3,
 	"Version": 3,
-	"VersionName": "3.2.1",
+	"VersionName": "3.2.2",
 	"EngineVersion": "5.7.0",
 	"FriendlyName": "Ars Electronica Futurelab - Utility",
-	"Description": "Shared utilities for the Ars Electronica Futurelab plugins: resolves the active AefConfig.ini (default or -aefConfig= override) and stages it as a loose, editable file in packaged builds.",
+	"Description": "Shared utilities for the Ars Electronica Futurelab plugins: resolves the active AefConfig.ini (default or -dsConfig= override) and stages it as a loose, editable file in packaged builds.",
 	"Category": "Ars Electronica Futurelab",
 	"CreatedBy": "Ars Electronica Futurelab",
 	"CreatedByURL": "https://ars.electronica.art/futurelab/",

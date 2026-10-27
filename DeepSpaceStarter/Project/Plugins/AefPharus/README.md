@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 3.2.1 |
+| Version | 3.2.2 |
 | Engine | Unreal Engine 5.7 |
 | Platform | Windows 64-bit |
 | Dependencies | nDisplay, AefUtility |
@@ -98,7 +98,7 @@ AefPharus reads the file returned by `UAefUtilityBPLibrary::GetConfigFilePath()`
 | Start | File used |
 |---|---|
 | no argument | `<Project>/Config/AefConfig.ini` |
-| `-aefConfig=<path>` | the given file (relative paths start at the project directory); if it does not exist, an error is logged (`LogAefUtility`) and the default file is used |
+| `-dsConfig=<path>` | the given file (relative paths start at the project directory); if it does not exist, an error is logged (`LogAefUtility`) and the default file is used |
 
 The configuration is read once at startup; restart after changes. `AefConfig.ini` may contain sections of other
 plugins (e.g. `[DeepSync]`); AefPharus only reads the sections below.
