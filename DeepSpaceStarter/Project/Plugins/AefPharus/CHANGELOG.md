@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.3] - 2026-10-27
+
+### Changed
+- Default transforms of the example actor `BP_PharusClusterFloorActor` now face front.
+
 ## [3.2.2] - 2026-10-27
 
 ### Changed

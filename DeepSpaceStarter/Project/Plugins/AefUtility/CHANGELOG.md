@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.3] - 2026-10-27
+
+### Changed
+- Version aligned with the project release 3.2.3; no functional changes.
+
 ## [3.2.2] - 2026-10-27
 
 ### Changed
