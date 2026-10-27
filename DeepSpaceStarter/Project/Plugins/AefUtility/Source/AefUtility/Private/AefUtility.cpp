@@ -20,7 +20,7 @@ DEFINE_LOG_CATEGORY(LogAefUtility);
 void FAefUtilityModule::StartupModule()
 {
 	// Resolve the active AefConfig.ini once at startup so the log always shows which file is
-	// used (default or -aefConfig= override), in the editor as well as in packaged builds.
+	// used (default or -dsConfig= override), in the editor as well as in packaged builds.
 	// The result is cached; later calls do not log again unless the command line changes.
 	UAefUtilityBPLibrary::GetConfigFilePath();
 }

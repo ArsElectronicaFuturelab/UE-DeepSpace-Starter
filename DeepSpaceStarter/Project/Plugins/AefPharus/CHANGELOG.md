@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.2] - 2026-10-27
+
+### Changed
+- The command-line override resolved by AefUtility is now `-dsConfig=<path>` (was `-aefConfig=<path>`).
+  Update existing launch commands. Log hints and documentation were adjusted.
+
 ## [3.2.1] - 2026-10-20
 
 ### Fixed

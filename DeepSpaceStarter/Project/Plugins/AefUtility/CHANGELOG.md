@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.2] - 2026-10-27
+
+### Changed
+- The command-line override is now `-dsConfig=<path>` (was `-aefConfig=<path>`). Behavior is unchanged; the old
+  argument is no longer recognized, so launch commands (e.g. nDisplay / Switchboard, `project.json` → `args`) must be updated.
+  Log and error messages now say `dsConfig override ...`.
+
 ## [3.2.1] - 2026-10-20
 
 Version aligned with the DeepSpace Starter 3.2.1 release. No functional changes.
