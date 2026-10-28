@@ -19,6 +19,10 @@ UE-DeepSpace-Starter is a Blueprint-based project template developed by Ars Elec
 - **Git LFS**: required when cloning (assets and binaries are stored with [Git LFS](https://git-lfs.com))
 - **Visual Studio 2022** with the "Game development with C++" workload: required for packaging only, because Unreal compiles the included C++ plugins when it packages the project
 
+## Caveat
+
+Regarding the usage of DirectX 12 in the Unreal Engine there is currently a known engine bug that you should be aware of: [Bug Report](https://forums.unrealengine.com/t/ndisplay-dx12-quad-buffer-stereo-outputs-mono-when-the-display-is-a-multi-gpu-nvidia-mosaic-works-on-dx11-and-on-a-single-gpu-surface-with-the-same-build/2740364).
+
 ## Quick Links
 
 Download UE DeepSpace Starter (Zips). [Deprecated] versions should still work but are not maintained anymore.
