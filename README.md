@@ -39,7 +39,7 @@ Download UE DeepSpace Starter (Zips). [Deprecated] versions should still work bu
 
 ## Versioning & Releases
 
-The project, the included plugins (AefPharus, AefUtility) and `AefConfig.ini` share **one version number** ([Semantic Versioning](https://semver.org)); the current version is shown in the release badge above.
+The project, the included plugins (AefPharus, AefUtility) and `AefConfig.ini` share **one version number** ([Semantic Versioning](https://semver.org)); the optional, external AefDeepSync plugin uses the same number. The current version is shown in the release badge above.
 
 The single source of truth is `ProjectVersion` in `DeepSpaceStarter/Project/Config/DefaultGame.ini`. These values must always match it:
 
@@ -75,7 +75,7 @@ UE-DeepSpace-Starter/
 │   │   │       ├── Models/            # 3D models
 │   │   │       └── Switchboard/       # nDisplay configuration assets
 │   │   ├── Config/                    # Project configuration
-│   │   │   ├── AefConfig.ini          # Pharus tracking configuration
+│   │   │   ├── AefConfig.ini          # Pharus (and optional DeepSync) configuration
 │   │   │   ├── Default*.ini           # Engine/Input/Game settings (DefaultGame.ini holds the version)
 │   │   │   └── Windows/               # Windows-specific engine settings
 │   │   └── Plugins/                   # C++ plugins (pre-compiled)
@@ -110,7 +110,7 @@ C++ plugin for Pharus laser tracking integration (included with pre-compiled bin
 
 ### AefUtility
 
-Shared C++ plugin used by AefPharus (included with pre-compiled binaries).
+Shared C++ plugin used by AefPharus and by the optional AefDeepSync plugin (included with pre-compiled binaries).
 
 **Features:**
 - Resolves the active configuration file: `Project/Config/AefConfig.ini`, or the file given with `-dsConfig=<path>`
@@ -120,12 +120,12 @@ Shared C++ plugin used by AefPharus (included with pre-compiled binaries).
 
 ### AefDeepSync (optional)
 
-Plugin for DeepSync wearables (heart rate, LED color, IDs) and their link to Pharus tracks. It is **not part of this repository** and is only needed for projects that use the DeepSync wearables. It is maintained in its own repository with its own version number: [UE-DeepSpace-DeepSync](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync).
+Plugin for DeepSync wearables (heart rate, LED color, IDs) and their link to Pharus tracks. It is **not part of this repository** and is only needed for projects that use the DeepSync wearables. It is maintained in its own repository, its version number follows the Starter release: [UE-DeepSpace-DeepSync](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync).
 
 **Installation:**
 1. Get the plugin from the [UE-DeepSpace-DeepSync](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync) repository.
 2. Copy its `Plugins/AefDeepSync/` folder to `DeepSpaceStarter/Project/Plugins/AefDeepSync/`. This folder is listed in `.gitignore` and is not committed to this repository.
-3. Restart the editor. The plugin requires AefPharus, which is already included.
+3. Restart the editor. The plugin requires AefPharus and AefUtility, which are already included.
 4. Configure it in the `[DeepSync]` section of `Project/Config/AefConfig.ini`. The section is already prepared and is ignored while the plugin is not installed.
 
 **Documentation:** See the [AefDeepSync README](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-DeepSync#readme).
