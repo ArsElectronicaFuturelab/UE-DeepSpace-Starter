@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 3.2.3 |
+| Version | 3.2.4 |
 | Engine | Unreal Engine 5.7 |
 | Platform | Windows 64-bit |
 | Dependencies | nDisplay, AefUtility |

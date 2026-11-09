@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.4] - 2026-11-09
+
+### Changed
+- Blueprint category of the Pharus function library is now `AEF|Pharus`, matching the C++ API. Blueprint nodes keep working; only their palette category changed.
+
 ## [3.2.3] - 2026-10-27
 
 ### Changed

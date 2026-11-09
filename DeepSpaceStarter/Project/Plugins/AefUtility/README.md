@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 3.2.3 |
+| Version | 3.2.4 |
 | Engine | Unreal Engine 5.7 |
 | Platform | Windows 64-bit |
 | Module | `AefUtility` (Runtime) |
@@ -24,7 +24,7 @@ so every plugin reads its configuration from the same file, and it copies that f
 - Resolves the path once at module startup and logs which file is used (`LogAefUtility`), in the editor and in packaged builds,
   with or without `-dsConfig=`. The result is cached; it is resolved again only when the process command line changes.
 - Copies `Config/AefConfig.ini` automatically into every packaged build as a loose, editable file (see [Packaging](#packaging)).
-- Used by AefPharus.
+- Used by AefPharus and by the optional AefDeepSync plugin (not part of this repository). AefUtility does not depend on AefDeepSync; the Starter works without it.
 
 AefUtility only resolves the path. It does not check sections or values inside the file. Configuration changes take effect after a restart.
 
