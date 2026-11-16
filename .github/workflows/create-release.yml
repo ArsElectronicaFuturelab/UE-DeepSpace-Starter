@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - main
-      - UE-5.7-DeepSpace-Starter
+      - UE-5.8-DeepSpace-Starter
     paths:
       - DeepSpaceStarter/Project/Config/DefaultGame.ini
   workflow_dispatch:

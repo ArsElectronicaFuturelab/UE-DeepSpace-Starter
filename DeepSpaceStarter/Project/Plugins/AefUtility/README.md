@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Version | 3.2.4 |
-| Engine | Unreal Engine 5.7 |
+| Version | 3.2.5 |
+| Engine | Unreal Engine 5.8 |
 | Platform | Windows 64-bit |
 | Module | `AefUtility` (Runtime) |
 | Developer | Ars Electronica Futurelab |

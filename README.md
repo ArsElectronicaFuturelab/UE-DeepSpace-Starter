@@ -51,7 +51,7 @@ The single source of truth is `ProjectVersion` in `DeepSpaceStarter/Project/Conf
 | `DeepSpaceStarter/Project/Plugins/*/*.uplugin` | `VersionName` (also increase the integer `Version`) |
 | `DeepSpaceStarter/Project/Config/AefConfig.ini` | `[General] Version` |
 
-**Creating a release:** update all versions above (plus the plugin `CHANGELOG.md` / `README.md` files) and push. The workflow [`.github/workflows/create-release.yml`](.github/workflows/create-release.yml) runs automatically when `DefaultGame.ini` changes on `main` or `UE-5.7-DeepSpace-Starter`:
+**Creating a release:** update all versions above (plus the plugin `CHANGELOG.md` / `README.md` files) and push. The workflow [`.github/workflows/create-release.yml`](.github/workflows/create-release.yml) runs automatically when `DefaultGame.ini` changes on `main` or `UE-5.8-DeepSpace-Starter`:
 
 1. Reads `ProjectVersion` and checks that all versions above match; the run fails if one differs.
 2. Skips the release if the tag `v<version>` already exists.

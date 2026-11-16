@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"Version": 17,
+	"Version": 18,
 	"VersionName": "3.2.5",
 	"EngineVersion": "5.8.0",
 	"FriendlyName": "Ars Electronica Futurelab - Pharus Tracking",
@@ -8,7 +8,7 @@
 	"Category": "Ars Electronica Futurelab",
 	"CreatedBy": "Ars Electronica Futurelab - Johannes Lugstein|Friedrich Bachinger|Otto Naderer",
 	"CreatedByURL": "https://ars.electronica.art/futurelab/",
-	"DocsURL": "https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/UE-5.7-DeepSpace-Starter/DeepSpaceStarter/Project/Plugins/AefPharus/README.md",
+	"DocsURL": "https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/blob/UE-5.8-DeepSpace-Starter/DeepSpaceStarter/Project/Plugins/AefPharus/README.md",
 	"MarketplaceURL": "",
 	"SupportURL": "https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/issues",
 	"CanContainContent": true,

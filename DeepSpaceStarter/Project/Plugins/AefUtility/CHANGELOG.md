@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.5] - 2026-11-16
+
+### Changed
+- Unreal Engine 5.8 support (`EngineVersion` 5.8.0, editor binaries rebuilt for UE 5.8). No functional changes.
+
 ## [3.2.4] - 2026-11-09
 
 ### Changed

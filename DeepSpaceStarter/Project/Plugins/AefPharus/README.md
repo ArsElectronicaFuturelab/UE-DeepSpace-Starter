@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Version | 3.2.4 |
-| Engine | Unreal Engine 5.7 |
+| Version | 3.2.5 |
+| Engine | Unreal Engine 5.8 |
 | Platform | Windows 64-bit |
 | Dependencies | nDisplay, AefUtility |
 | Developer | Ars Electronica Futurelab |
