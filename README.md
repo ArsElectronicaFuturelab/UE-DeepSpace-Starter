@@ -1,10 +1,10 @@
 # Unreal Engine 5 - DeepSpace-Starter
 
-[![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.7-blue)](https://unrealengine.com)
+[![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.8-blue)](https://unrealengine.com)
 [![Release](https://img.shields.io/github/v/release/ArsElectronicaFuturelab/UE-DeepSpace-Starter)](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-Unreal Engine 5.7 project template for interactive installations with Pharus laser tracking and nDisplay cluster rendering.
+Unreal Engine 5.8 project template for interactive installations with Pharus laser tracking and nDisplay cluster rendering.
 
 ## Overview
 
@@ -14,7 +14,7 @@ UE-DeepSpace-Starter is a Blueprint-based project template developed by Ars Elec
 
 ## Requirements
 
-- **Unreal Engine**: 5.7
+- **Unreal Engine**: 5.8
 - **Platform**: Windows 64-bit
 - **Git LFS**: required when cloning (assets and binaries are stored with [Git LFS](https://git-lfs.com))
 - **Visual Studio 2022** with the "Game development with C++" workload: required for packaging only, because Unreal compiles the included C++ plugins when it packages the project
@@ -29,13 +29,14 @@ Download UE DeepSpace Starter (Zips). [Deprecated] versions should still work bu
 
 | Version | Status | Download |
 |---------|--------|----------|
-| UE 5.7 | **Current** | [Latest release](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest) (ZIP incl. all LFS files) |
+| UE 5.8 | **Current** | [Latest release](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/latest) (ZIP incl. all LFS files) |
+| UE 5.7 | Deprecated | [Release v3.2.4](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/releases/tag/v3.2.4) (ZIP incl. all LFS files) |
 | UE 5.3 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.3-DeepSpace-Starter-Experimental.zip) |
 | UE 5.1 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.1-DeepSpace-Starter.zip) |
 | UE 5.0 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-5.0-DeepSpace-Starter.zip) |
 | UE 4.27 | Deprecated | [Download](https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter/archive/refs/heads/UE-4.27-DeepSpace-Starter.zip) |
 
-> **Note:** For UE 5.7 use the ZIP from the release. GitHub's "Code → Download ZIP" may contain only Git LFS pointer files instead of the actual assets.
+> **Note:** For UE 5.8 and UE 5.7 use the ZIP from the release. GitHub's "Code → Download ZIP" may contain only Git LFS pointer files instead of the actual assets.
 
 ## Versioning & Releases
 
@@ -141,14 +142,14 @@ The project uses the following Unreal Engine plugins:
 
 ### Prerequisites
 
-1. **Install Unreal Engine 5.7**
+1. **Install Unreal Engine 5.8**
    - Download from Epic Games Launcher
-   - Associate .uproject files with UE 5.7
+   - Associate .uproject files with UE 5.8
 
 2. **Clone or download the repository**
    ```bash
    git lfs install
-   git clone --branch UE-5.7-DeepSpace-Starter https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter.git
+   git clone --branch UE-5.8-DeepSpace-Starter https://github.com/ArsElectronicaFuturelab/UE-DeepSpace-Starter.git
    cd UE-DeepSpace-Starter
    ```
 
@@ -258,7 +259,7 @@ If you're new to nDisplay, check out these tutorials:
 
 Packaging compiles the included C++ plugins, so Visual Studio 2022 with the C++ workload has to be installed. The packaging log shows `... is being treated as a code-based project ... Creating temporary .Target.cs files.`; this is expected (see [AefUtility README → Packaging](DeepSpaceStarter/Project/Plugins/AefUtility/README.md#packaging)).
 
-For more details, see [Build Operations Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/build-operations-cooking-packaging-deploying-and-running-projects-in-unreal-engine?application_version=5.7).
+For more details, see [Build Operations Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/build-operations-cooking-packaging-deploying-and-running-projects-in-unreal-engine?application_version=5.8).
 
 ### Deployment Folder Structure
 
@@ -282,7 +283,7 @@ Update `DeepSpaceStarter/Deploy/project.json` for production deployment:
 ```json
 {
     "startMap": "Deep_Space_8K",
-    "version": "UE5.7",
+    "version": "UE5.8",
     "type": "unreal",
     "executable": "\\Build\\Windows\\DeepSpaceStarter.exe",
     "nDisplay": "\\Switchboard\\ND_Deep_Space_8K.ndisplay",
@@ -293,7 +294,7 @@ Update `DeepSpaceStarter/Deploy/project.json` for production deployment:
 | Field | Description |
 |-------|-------------|
 | `startMap` | Name of the level to load at startup |
-| `version` | Unreal Engine version (UE5.7) |
+| `version` | Unreal Engine version (UE5.8) |
 | `type` | Project type (`unreal`) |
 | `executable` | Path to packaged executable (relative to Deploy/) |
 | `nDisplay` | Path to nDisplay configuration (wall + floor, relative to Deploy/) |
@@ -333,7 +334,7 @@ Deploy/
 
 - **NO Fixed Framerate:** disable fixed framerate to avoid cluster desyncs
 - **nDisplay Actor:** Always include in maps intended for Deep Space playback
-- **DirectX 11:** Support for DirectX 11 rendering in UE 5.7 (DirectX 12 may cause applications to not launch in DeepSpace)
+- **DirectX 11:** Support for DirectX 11 rendering in UE 5.8 (DirectX 12 may cause applications to not launch in DeepSpace)
 - **Stereoscopic 3D:** Set Render Mode to `Stereo` for active 3D output
 - **Configuration Export:** When modifying DeepSpace nDisplay actors, export the `.ndisplay` file to `/Switchboard/`
 
@@ -364,5 +365,5 @@ MIT License - See [LICENSE](LICENSE) for details. The license applies to the who
 For technical support or questions:
 
 - [Ars Electronica Futurelab](https://ars.electronica.art/futurelab/)
-- [Unreal Engine nDisplay Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/ndisplay-overview-for-unreal-engine?application_version=5.7)
-- [Switchboard Quick Start Guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/switchboard-quick-start-for-unreal-engine?application_version=5.7)
+- [Unreal Engine nDisplay Documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/ndisplay-overview-for-unreal-engine?application_version=5.8)
+- [Switchboard Quick Start Guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/switchboard-quick-start-for-unreal-engine?application_version=5.8)
